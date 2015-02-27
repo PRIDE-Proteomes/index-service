@@ -22,6 +22,10 @@ public class ProteomesIndexService {
         this.proteomesRepository.deleteAll();
     }
 
+    public void save(PeptiForm peptiForm) {
+        this.proteomesRepository.save(peptiForm);
+    }
+
     public void save(Collection<PeptiForm> peptiForms) {
         this.proteomesRepository.save(peptiForms);
     }
