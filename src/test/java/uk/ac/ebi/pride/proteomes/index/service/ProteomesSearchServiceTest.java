@@ -267,17 +267,24 @@ public class ProteomesSearchServiceTest extends SolrTestCaseJ4 {
 
     @Test
     public void testFindByProtein() {
-        List<PeptiForm> list = proteomesSearchService.findByProtein("P12345");
+        List<PeptiForm> list = proteomesSearchService.findAllByProtein("P12345");
         assertEquals(2, list.size());
         for (PeptiForm peptiForm : list) {
             assertTrue(peptiForm.getProteins().contains("P12345"));
         }
+        // same with paged query (restrict to one result)
+        list = proteomesSearchService.findByProtein("P12345", new PageRequest(0,1)).getContent();
+        assertEquals(1, list.size());
 
-        list = proteomesSearchService.findByProtein("P12347");
+        list = proteomesSearchService.findAllByProtein("P12347");
+        assertEquals(1, list.size());
+        assertEquals(PEPTIDE_3_FORM_1_ID, list.get(0).getId());
+        // same with paged query
+        list = proteomesSearchService.findByProtein("P12347", new PageRequest(0,10)).getContent();
         assertEquals(1, list.size());
         assertEquals(PEPTIDE_3_FORM_1_ID, list.get(0).getId());
 
-        list = proteomesSearchService.findByProtein("P98765");
+        list = proteomesSearchService.findAllByProtein("P98765");
         assertEquals(1, list.size());
         PeptiForm peptiForm = list.get(0);
         assertFalse(peptiForm.getProteins().isEmpty());
@@ -286,51 +293,99 @@ public class ProteomesSearchServiceTest extends SolrTestCaseJ4 {
     }
 
     @Test
-    public void testFind() {
+    public void testFindByMod() {
+        String mod = "Oxidation";
+        Page<PeptiForm> page = proteomesSearchService.findByMod(mod, new PageRequest(0,10));
+        assertEquals(1, page.getTotalElements());
+
+        PeptiForm peptiForm = page.getContent().get(0);
+        assertTrue(peptiForm.getMods().contains(mod));
+        assertEquals(PEPTIDE_4_FORM_2_ID, peptiForm.getId());
+    }
+
+    @Test
+    public void testFindByGroup() {
+        List<PeptiForm> list = proteomesSearchService.findAllByUpGroup("P12345");
+        assertEquals(2, list.size());
+        for (PeptiForm peptiForm : list) {
+            assertTrue(peptiForm.getUpGroups().contains("P12345"));
+            assertTrue(peptiForm.getProteins().contains("P12345"));
+        }
+        // same with paged query (restricted to one result)
+        list = proteomesSearchService.findByUpGroup("P12345", new PageRequest(0,1)).getContent();
+        assertEquals(1, list.size());
+        assertTrue(list.get(0).getUpGroups().contains("P12345"));
+        assertTrue(list.get(0).getProteins().contains("P12345"));
+
+        list = proteomesSearchService.findAllByGeneGroup("GENE1");
+        assertEquals(1, list.size());
+        assertTrue(list.get(0).getGeneGroups().contains("GENE1"));
+
+        // same with paged query
+        list = proteomesSearchService.findByGeneGroup("GENE1", new PageRequest(0,1)).getContent();
+        assertEquals(1, list.size());
+        list = proteomesSearchService.findByGeneGroup("GENE1", new PageRequest(1,1)).getContent();
+        assertEquals(0, list.size());
+    }
+
+
+
+    @Test
+    public void testFindByQuery() {
         // service term(s) contains 'human' which matches 8 records
-        Page<PeptiForm> page = proteomesSearchService.find(SPECIES_HUMAN, new PageRequest(0, 10));
+        Page<PeptiForm> page = proteomesSearchService.findByQuery(SPECIES_HUMAN, new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS+HBV_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.find("human", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("human", new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS+HBV_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.find("homo", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("homo", new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.find("9606", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("9606", new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.find("Mouse", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("Mouse", new PageRequest(0, 10));
         assertEquals(MOUSE_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.find("?ouse", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("?ouse", new PageRequest(0, 10));
         assertEquals(MOUSE_RECORDS+HBV_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.find("10090", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("10090", new PageRequest(0, 10));
         assertEquals(MOUSE_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.find(PEPTIDE_6_SEQUENCE, new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery(PEPTIDE_6_SEQUENCE, new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
-        page = proteomesSearchService.find("P12347", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("P12347", new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
-        page = proteomesSearchService.find("P????5", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("P????5", new PageRequest(0, 10));
         assertEquals(3, page.getTotalElements());
 
-        page = proteomesSearchService.find("*", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("*", new PageRequest(0, 10));
         assertEquals(COUNT_TOTAL_DOCS, page.getTotalElements());
 
-        page = proteomesSearchService.find("", new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery("", new PageRequest(0, 10));
         assertEquals(COUNT_TOTAL_DOCS, page.getTotalElements());
 
-        page = proteomesSearchService.find(null, new PageRequest(0, 10));
+        page = proteomesSearchService.findByQuery(null, new PageRequest(0, 10));
         assertEquals(COUNT_TOTAL_DOCS, page.getTotalElements());
+
+        page = proteomesSearchService.findByQuery("GENE1", new PageRequest(0, 10));
+        assertEquals(1, page.getTotalElements());
+        page = proteomesSearchService.findByQuery("Gene1", new PageRequest(0, 10));
+        assertEquals(1, page.getTotalElements());
+
+        page = proteomesSearchService.findByQuery("kinase", new PageRequest(0, 10));
+        assertEquals(1, page.getTotalElements());
+        page = proteomesSearchService.findByQuery("description", new PageRequest(0, 10));
+        assertEquals(1, page.getTotalElements());
     }
 
     @Test
     public void testFindNot() {
-        Page<PeptiForm> page = proteomesSearchService.findNot("Mouse", new PageRequest(0, 10));
+        Page<PeptiForm> page = proteomesSearchService.findByQueryNot("Mouse", new PageRequest(0, 10));
         assertEquals(COUNT_TOTAL_DOCS - MOUSE_RECORDS, page.getTotalElements());
     }
 
@@ -391,7 +446,7 @@ public class ProteomesSearchServiceTest extends SolrTestCaseJ4 {
 
         // without species filter we expect the same result as a normal search
         long countFilter = proteomesSearchService.findByQueryAndFilterTaxid("human", null, new PageRequest(0,10)).getTotalElements();
-        long count = proteomesSearchService.find("human", new PageRequest(0, 10)).getTotalElements();
+        long count = proteomesSearchService.findByQuery("human", new PageRequest(0, 10)).getTotalElements();
         assertEquals(countFilter, count);
         assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
 
@@ -462,48 +517,106 @@ public class ProteomesSearchServiceTest extends SolrTestCaseJ4 {
     }
 
     @Test
-    public void testCount() {
-        // service term(s) contains 'human' which matches 8 records
-        long count = proteomesSearchService.count(SPECIES_HUMAN);
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+    public void testCountByMod() {
+        Page<PeptiForm> page = proteomesSearchService.findByMod("Oxidation", new PageRequest(0,10));
+        assertEquals(1, page.getTotalElements());
 
-        count = proteomesSearchService.count("human");
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+        page = proteomesSearchService.findByMod("Phosphorylation", new PageRequest(0,10));
+        assertEquals(1, page.getTotalElements());
 
-        count = proteomesSearchService.count("homo");
-        assertEquals(HUMAN_RECORDS, count);
+        page = proteomesSearchService.findByMod("Deamidation", new PageRequest(0,10));
+        assertEquals(1, page.getTotalElements());
 
-        count = proteomesSearchService.count("9606");
-        assertEquals(HUMAN_RECORDS, count);
+        // non-existing modification, no results!
+        page = proteomesSearchService.findByMod("foo", new PageRequest(0,10));
+        assertEquals(0, page.getTotalElements());
 
-        count = proteomesSearchService.count("Mouse");
-        assertEquals(MOUSE_RECORDS, count);
+        // now wildcards allowed
+        page = proteomesSearchService.findByMod("*", new PageRequest(0,10));
+        assertEquals(0, page.getTotalElements());
 
-        count = proteomesSearchService.count("?ouse");
-        assertEquals(MOUSE_RECORDS+HBV_RECORDS, count);
+        // if an empty mod term is given we throw an exception
+        boolean failed = false;
+        try {
+            proteomesSearchService.findByMod("", new PageRequest(0, 10));
+        } catch (Exception e) {
+            failed = true;
+        }
+        assertTrue(failed);
 
-        count = proteomesSearchService.count("10090");
-        assertEquals(MOUSE_RECORDS, count);
+        // if no mod term is given at all we throw an exception
+        failed = false;
+        try {
+            proteomesSearchService.findByMod(null, new PageRequest(0,10));
+        } catch (Exception e) {
+            failed = true;
+        }
+        assertTrue(failed);
+    }
 
-        count = proteomesSearchService.count(PEPTIDE_6_SEQUENCE);
-        assertEquals(1, count);
-
-        count = proteomesSearchService.count("P12345");
+    @Test
+    public void testCountByGroup() {
+        long count = proteomesSearchService.countByUpGroup("P12345");
         assertEquals(2, count);
 
-        count = proteomesSearchService.count("P????5");
+        count = proteomesSearchService.countByGeneGroup("GENE1");
+        assertEquals(1, count);
+    }
+
+    @Test
+    public void testCount() {
+        // service term(s) contains 'human' which matches 8 records
+        long count = proteomesSearchService.countByQuery(SPECIES_HUMAN);
+        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+
+        count = proteomesSearchService.countByQuery("human");
+        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+
+        count = proteomesSearchService.countByQuery("homo");
+        assertEquals(HUMAN_RECORDS, count);
+
+        count = proteomesSearchService.countByQuery("9606");
+        assertEquals(HUMAN_RECORDS, count);
+
+        count = proteomesSearchService.countByQuery("Mouse");
+        assertEquals(MOUSE_RECORDS, count);
+
+        count = proteomesSearchService.countByQuery("?ouse");
+        assertEquals(MOUSE_RECORDS+HBV_RECORDS, count);
+
+        count = proteomesSearchService.countByQuery("10090");
+        assertEquals(MOUSE_RECORDS, count);
+
+        count = proteomesSearchService.countByQuery(PEPTIDE_6_SEQUENCE);
+        assertEquals(1, count);
+
+        count = proteomesSearchService.countByQuery("P12345");
+        assertEquals(2, count);
+
+        count = proteomesSearchService.countByQuery("P????5");
         assertEquals(3, count);
+
+        count = proteomesSearchService.countByQuery("gene1");
+        assertEquals(1, count);
+
+        count = proteomesSearchService.countByQuery("GENE1");
+        assertEquals(1, count);
+
+        count = proteomesSearchService.countByQuery("kinase");
+        assertEquals(1, count);
+        count = proteomesSearchService.countByQuery("description");
+        assertEquals(1, count);
     }
 
     @Test
     public void testCountNot() {
-        long count = proteomesSearchService.countNot("Mouse");
+        long count = proteomesSearchService.countByQueryNot("Mouse");
         assertEquals(COUNT_TOTAL_DOCS - MOUSE_RECORDS, count);
 
-        count = proteomesSearchService.countNot("9606");
+        count = proteomesSearchService.countByQueryNot("9606");
         assertEquals(COUNT_TOTAL_DOCS - HUMAN_RECORDS, count);
 
-        count = proteomesSearchService.countNot("somenonsense");
+        count = proteomesSearchService.countByQueryNot("somenonsense");
         assertEquals(COUNT_TOTAL_DOCS, count);
     }
 

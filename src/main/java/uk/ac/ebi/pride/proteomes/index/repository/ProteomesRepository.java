@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.springframework.data.solr.core.query.Query.Operator.AND;
+import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm.*;
 
 /**
  * @author florian@ebi.ac.uk
@@ -20,33 +21,32 @@ import static org.springframework.data.solr.core.query.Query.Operator.AND;
  */
 public interface ProteomesRepository extends SolrCrudRepository<PeptiForm, String> {
 
+    /*
+     * Global queries, query for all records
+     */
+
     Page<PeptiForm> findAll(Pageable pageable);
 
-    @Facet(fields = {PeptiForm.PEPTIFORM_TAXID}, limit = 100)
+    @Facet(fields = {PEPTIFORM_TAXID}, limit = 100)
     @Query(value = PeptiForm.TEXT + ":*")
     FacetPage<PeptiForm> getTaxidFacets(Pageable pageable);
 
+
+    /*
+     * Queries for specific fields
+     */
+
     Page<PeptiForm> findBySequence(String sequence, Pageable pageable);
-    Long countBySequence(String sequence);
 
     Page<PeptiForm> findByTaxid(int taxid, Pageable pageable);
-    Long countByTaxid(int taxid);
 
-    @Query(value = PeptiForm.PEPTIFORM_SPECIES+":?0")
+    @Query(value = PEPTIFORM_SPECIES+":?0")
     Page<PeptiForm> findBySpecies(String species, Pageable pageable);
 
-    @Query(value = PeptiForm.TEXT + ":?0")
-    Page<PeptiForm> findByQuery(String query, Pageable pageable);
+    Page<PeptiForm> findByProteins(String proteinAcc, Pageable pageable);
+    List<PeptiForm> findAllByProteins(String proteinAcc);
 
-    @Facet(fields = {PeptiForm.PEPTIFORM_TAXID}, limit = 100)
-    @Query(value = PeptiForm.TEXT + ":?0")
-    FacetPage<PeptiForm> findByQueryFacetTaxid(String query, Pageable pageable);
-
-    @Query(value = "-"+ PeptiForm.TEXT + ":?0")
-    Page<PeptiForm> findByQueryNot(String query, Pageable pageable);
-
-    List<PeptiForm> findByProteins(String proteinAcc);
-    long countByProteins(String proteinAcc);
+    Page<PeptiForm> findByMods(String mod, Pageable pageable);
 
     Page<PeptiForm> findByNumProteinsGreaterThan(int num, Pageable page);
     long countByNumProteinsGreaterThan(int num);
@@ -54,8 +54,28 @@ public interface ProteomesRepository extends SolrCrudRepository<PeptiForm, Strin
     Page<PeptiForm> findByNumProteinsLessThan(int num, Pageable page);
     long countByNumProteinsLessThan(int num);
 
+    List<PeptiForm> findAllByUpGroups(String upGroupId);
+    Page<PeptiForm> findByUpGroups(String upGroupId, Pageable pageable);
 
-    @Query(value = PeptiForm.TEXT+":?0", filters = PeptiForm.PEPTIFORM_TAXID+":(?1)", defaultOperator = AND)
+    List<PeptiForm> findAllByGeneGroups(String geneGroupId);
+    Page<PeptiForm> findByGeneGroups(String geneGroupId, Pageable pageable);
+
+
+    /*
+     * General queries, not field specific
+     */
+
+    @Query(value = PeptiForm.TEXT + ":?0")
+    Page<PeptiForm> findByQuery(String query, Pageable pageable);
+
+    @Facet(fields = {PEPTIFORM_TAXID}, limit = 100)
+    @Query(value = PeptiForm.TEXT + ":?0")
+    FacetPage<PeptiForm> findByQueryFacetTaxid(String query, Pageable pageable);
+
+    @Query(value = "-"+ TEXT + ":?0")
+    Page<PeptiForm> findByQueryNot(String query, Pageable pageable);
+
+    @Query(value = TEXT+":?0", filters = PEPTIFORM_TAXID+":(?1)", defaultOperator = AND)
     Page<PeptiForm> findByQueryAndFilterTaxid(String query, Collection<Integer> taxIds, Pageable pageable);
 
 

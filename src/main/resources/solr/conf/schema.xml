@@ -20,7 +20,7 @@
  This is the Solr schema file. This file should be named "schema.xml" and
  should be in the conf directory under the solr home
  (i.e. ./solr/conf/schema.xml by default)
- or located where the classloader for the Solr webapp can find it.
+ or located where the classloader for the Solr webapp can findByQuery it.
 
  For more information, on how to customize this file, please see
  http://wiki.apache.org/solr/SchemaXml
@@ -78,14 +78,20 @@
            trailing underscores (e.g. _version_) are reserved.
         -->
 
-        <field name="id"                  type="string"       indexed="true" stored="true" required="true"  multiValued="false"/>
-        <field name="peptiform_sequence"  type="lowercase"    indexed="true" stored="true" required="true"  multiValued="false"/>
-        <field name="peptiform_taxid"     type="int"          indexed="true" stored="true" required="true"  multiValued="false"/>
-        <field name="peptiform_species"   type="text_general" indexed="true" stored="true" required="false" multiValued="false"/>
-        <field name="num_proteins"        type="int"          indexed="true" stored="true" required="false" multiValued="false"/>
-        <field name="proteins"            type="string"       indexed="true" stored="true" required="false" multiValued="true"/>
-        <!-- ToDo: protein groups? (genes, UP entries,...) -->
-        <!-- ToDo: number of groups? (to allow sorting/filtering for unique peptides) -->
+        <field name="id"                  type="string"       indexed="true"  stored="true"  required="true"  multiValued="false"/>
+        <field name="peptiform_sequence"  type="lowercase"    indexed="true"  stored="true"  required="true"  multiValued="false"/>
+        <field name="peptiform_taxid"     type="int"          indexed="true"  stored="true"  required="true"  multiValued="false"/>
+        <field name="peptiform_species"   type="text_general" indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="num_proteins"        type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="proteins"            type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="mods"                type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+
+        <field name="num_up_groups"       type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="up_groups"           type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="num_gene_groups"     type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="gene_groups"         type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="group_descs"         type="text_general" indexed="false" stored="false" required="false" multiValued="false"/>
+
         <!-- ToDo: peptide length? (to allow range queries and sorting) -->
         <!-- ToDo: modifications?  -->
         <!-- ToDo: evidence/score -->
@@ -128,6 +134,10 @@
     <copyField source="peptiform_taxid"     dest="text"/>
     <copyField source="peptiform_species"   dest="text"/>
     <copyField source="proteins"            dest="text"/>
+    <copyField source="up_groups"           dest="text"/>
+    <copyField source="gene_groups"         dest="text"/>
+    <copyField source="group_descs"         dest="text"/>
+    <copyField source="mods"                dest="text"/>
 
     <types>
         <!-- field type definitions. The "name" attribute is

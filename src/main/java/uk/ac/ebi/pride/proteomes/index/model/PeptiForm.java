@@ -1,6 +1,7 @@
 package uk.ac.ebi.pride.proteomes.index.model;
 
 import org.apache.solr.client.solrj.beans.Field;
+import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
@@ -9,9 +10,10 @@ import java.util.List;
  *
  * @author florian@ebi.ac.uk
  */
+@SuppressWarnings("UnusedDeclaration")
 public class PeptiForm implements SolrPeptiForm {
 
-
+    @Id
     @Field(ID)
     private String id;
 
@@ -29,6 +31,24 @@ public class PeptiForm implements SolrPeptiForm {
 
     @Field(PROTEINS)
     private List<String> proteins;
+
+    @Field(MODS)
+    private List<String> mods;
+
+    @Field(NUM_UP_GROUPS)
+    private int numUpGroups;
+
+    @Field(UP_GROUPS)
+    private List<String> upGroups;
+
+    @Field(NUM_GENE_GROUPS)
+    private int numGeneGroups;
+
+    @Field(GENE_GROUPS)
+    private List<String> geneGroups;
+
+    @Field(GROUP_DESCS)
+    private String groupDescs;
 
 
     public String getId() {
@@ -77,5 +97,49 @@ public class PeptiForm implements SolrPeptiForm {
 
     public void setProteins(List<String> proteins) {
         this.proteins = proteins;
+    }
+
+    public List<String> getMods() {
+        return mods;
+    }
+
+    public void setMods(List<String> mods) {
+        this.mods = mods;
+    }
+
+    public int getNumUpGroups() {
+        return numUpGroups;
+    }
+
+    public void setNumUpGroups(int numUpGroups) {
+        this.numUpGroups = numUpGroups;
+    }
+
+    public List<String> getUpGroups() {
+        return upGroups;
+    }
+
+    public void setUpGroups(List<String> upGroups) {
+        this.upGroups = upGroups;
+    }
+
+    public int getNumGeneGroups() {
+        return numGeneGroups;
+    }
+
+    public void setNumGeneGroups(int numGeneGroups) {
+        this.numGeneGroups = numGeneGroups;
+    }
+
+    public List<String> getGeneGroups() {
+        return geneGroups;
+    }
+
+    public void setGeneGroups(List<String> geneGroups) {
+        this.geneGroups = geneGroups;
+    }
+
+    public void setGroupDescs(String groupDescs) {
+        this.groupDescs = groupDescs;
     }
 }
