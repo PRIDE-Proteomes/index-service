@@ -1,2 +1,4 @@
 .idea/
 *.iml
+src/main/resources/solr/collection1/data/
+target/
