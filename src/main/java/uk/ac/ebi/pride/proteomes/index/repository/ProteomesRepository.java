@@ -19,7 +19,7 @@ import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm.*;
  *
  * Note: using the Query annotation allows wildcards to go straight into the query
  */
-public interface ProteomesRepository extends SolrCrudRepository<PeptiForm, String> {
+public interface ProteomesRepository extends SolrCrudRepository<PeptiForm, String>, ProteomesRepositoryCustom {
 
     /*
      * Global queries, query for all records

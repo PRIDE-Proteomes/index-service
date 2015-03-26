@@ -6,12 +6,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.core.query.result.FacetFieldEntry;
 import org.springframework.data.solr.core.query.result.FacetPage;
-import org.springframework.data.solr.core.query.result.SolrResultPage;
 import org.springframework.stereotype.Service;
 import uk.ac.ebi.pride.proteomes.index.model.PeptiForm;
 import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm;
 import uk.ac.ebi.pride.proteomes.index.repository.ProteomesRepository;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 /**
@@ -35,13 +35,12 @@ import java.util.*;
  * @author florian@ebi.ac.uk
  */
 @Service
+@SuppressWarnings("unused")
 public class ProteomesSearchService {
 
+    @Resource
     private ProteomesRepository proteomesRepository;
 
-    public ProteomesSearchService(ProteomesRepository proteomesRepository) {
-        this.proteomesRepository = proteomesRepository;
-    }
 
     private static final PageRequest CPR = new PageRequest(0,1); // PageRequest used for counting (page.getTotalElements())
     private static void checkTerm(String term) {
@@ -221,6 +220,10 @@ public class ProteomesSearchService {
     }
     public long countByQueryAndFilterTaxid(String query, Collection<Integer> taxIds) {
         return this.findByQueryAndFilterTaxid(query, taxIds, CPR).getTotalElements();
+    }
+
+    public FacetPage<PeptiForm> facetProteinsTest1(int page, int size) {
+        return this.proteomesRepository.facetProteinsTest1(page, size);
     }
 
 }

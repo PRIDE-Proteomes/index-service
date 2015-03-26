@@ -1,52 +1,45 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
-import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.springframework.data.solr.core.SolrTemplate;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.pride.proteomes.index.model.PeptiForm;
 import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm;
-import uk.ac.ebi.pride.proteomes.index.repository.ProteomesRepository;
-import uk.ac.ebi.pride.proteomes.index.repository.RepositoryFactory;
 
+import javax.annotation.Resource;
+
+import java.io.IOException;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 import static uk.ac.ebi.pride.proteomes.index.service.TestData.*;
 
 /**
  * @author florian@ebi.ac.uk
  */
-public class ProteomesIndexServiceTest extends SolrTestCaseJ4 {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {TestContext.class})
+public class ProteomesIndexServiceTest {
 
+    @Resource
     private SolrServer server;
+    @Resource
     private ProteomesIndexService proteomesIndexService;
+    @Resource
     private ProteomesSearchService proteomesSearchService;
 
 
-    @BeforeClass
-    public static void initialise() throws Exception {
-        initCore("src/main/resources/solr/conf/solrconfig.xml",
-                "src/main/resources/solr/conf/schema.xml",
-                "src/main/resources/solr",
-                "");
-    }
-
     @Before
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        server = new EmbeddedSolrServer(h.getCoreContainer(), h.getCore().getName());
-        RepositoryFactory repositoryFactory = new RepositoryFactory(new SolrTemplate(server));
-        ProteomesRepository repo = repositoryFactory.create();
-        proteomesIndexService = new ProteomesIndexService(repo);
-        proteomesSearchService = new ProteomesSearchService(repo);
-
+    @After
+    public void deleteAll() throws SolrServerException, IOException {
         // make sure we don't have any old data kicking around
         server.deleteByQuery("*:*");
 
@@ -54,6 +47,13 @@ public class ProteomesIndexServiceTest extends SolrTestCaseJ4 {
         server.commit();
     }
 
+    /**
+     * Simple save and delete test. Uses the ProteomesIndexService to create
+     * and save records and verifies that with a direct query on to the Solr
+     * server. Then the same is done with a delete.
+     *
+     * @throws SolrServerException
+     */
     @Test
     public void testSaveAndDelete() throws SolrServerException {
         // first insert the test data
@@ -82,7 +82,6 @@ public class ProteomesIndexServiceTest extends SolrTestCaseJ4 {
         assertEquals(0, response.getResults().getNumFound());
 
     }
-
 
     /**
      * We assume that document identity is given by the document ID and documents are overwritten

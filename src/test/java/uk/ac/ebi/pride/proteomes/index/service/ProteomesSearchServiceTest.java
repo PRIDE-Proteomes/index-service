@@ -1,62 +1,111 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
 
-import org.apache.solr.SolrTestCaseJ4;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.solr.core.SolrTemplate;
+import org.springframework.data.solr.core.query.result.FacetPage;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.pride.proteomes.index.model.PeptiForm;
 import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm;
-import uk.ac.ebi.pride.proteomes.index.repository.RepositoryFactory;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static junit.framework.Assert.*;
 import static uk.ac.ebi.pride.proteomes.index.service.TestData.*;
 
 /**
  * @author florian@ebi.ac.uk
  *
  */
-public class ProteomesSearchServiceTest extends SolrTestCaseJ4 {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {TestContext.class})
+public class ProteomesSearchServiceTest {
 
+    @Resource
     private SolrServer server;
+    @Resource
     private ProteomesSearchService proteomesSearchService;
 
+    // the data directory for our test collection (created by the tests)
+    // ToDo: we should remove the temporary data dir after each test, but that causes the
+    // ToDo: Solr server/container to fault. We have to first solve that...
+//    private static final File dataDir = new File("src/main/resources/solr/collection1/data");
 
-    @BeforeClass
-    public static void initialise() throws Exception {
-        initCore("src/main/resources/solr/conf/solrconfig.xml",
-                "src/main/resources/solr/conf/schema.xml",
-                "src/main/resources/solr",
-                "");
-    }
+
+//    @BeforeClass
+//    public static void initialise() throws Exception {
+//        // we want to start from scratch, so we make sure there is no old data
+//        if (dataDir.exists()) {
+//            FileUtils.deleteDirectory(dataDir);
+//        }
+//    }
+
+//    @AfterClass
+//    public static void teardown() throws Exception {
+//        // clean up any data we may have left behind
+//        if (!dataDir.exists()) {
+//            System.out.println("Data directory does not exist!");
+//        } else {
+//            FileUtils.deleteDirectory(dataDir);
+//        }
+//    }
 
     @Before
-    @Override
     public void setUp() throws Exception {
-        super.setUp();
+//        System.out.println("Data dir exists: " + dataDir.exists());
+//        try {
+//            server.optimize();
+//        } catch (Exception e){
+//            System.out.println("optimise exception");
+//        }
+//        try {
+//            server.rollback();
+//        } catch (Exception e){
+//            System.out.println("rollback exception");
+//        }
+//        CoreContainer container = ((EmbeddedSolrServer) server).getCoreContainer();
+//        container.shutdown();
+//        container.load();
+//        container.reload("collection1");
 
-        server = new EmbeddedSolrServer(h.getCoreContainer(), h.getCore().getName());
-//        server = new HttpSolrServer("http://localhost:9999/solr/proteomes-peptiform");
-        RepositoryFactory repositoryFactory = new RepositoryFactory(new SolrTemplate(server));
-        proteomesSearchService = new ProteomesSearchService(repositoryFactory.create());
+//        CoreContainer container = new CoreContainer("src/main/resources/solr");
+//        container.load();
+//        CoreContainer container = ((EmbeddedSolrServer) server).getCoreContainer();
+//        for (SolrCore core : container.getCores()) {
+//            System.out.println(":" + core.getName());
+//        }
+//        container.load();
+////        container.reload("collection1");
+//        System.out.println("shared? " + container.isShareSchema());
+//        System.out.println("Data dir exists: " + dataDir.exists());
+//        server.optimize();
+//        server.commit();
+//
+//        System.out.println("Collection1 loaded? " + container.isLoaded("collection1"));
+//        System.out.println("Collection1 loaded no close? " + container.isLoadedNotPendingClose("collection1"));
+//        server = new EmbeddedSolrServer(container, "collection1");
 
         // make sure we don't have any old data kicking around
-        server.deleteByQuery("*:*");
+        try {
+            server.deleteByQuery("*:*");
+        } catch (Exception e) {
+            System.out.println("delete exception");
+        }
 
         // insert test data
         server.add(createTestDocs());
@@ -694,4 +743,14 @@ public class ProteomesSearchServiceTest extends SolrTestCaseJ4 {
         assertTrue(mouseCount != null);
         assertEquals(new Long(MOUSE_RECORDS), mouseCount);
     }
+
+
+
+    @Test
+    public void testFacetProteins() {
+        FacetPage<PeptiForm> facets = proteomesSearchService.facetProteinsTest1(10, 9);
+
+        System.out.println("total elements: " + facets.getTotalElements());
+    }
+
 }
