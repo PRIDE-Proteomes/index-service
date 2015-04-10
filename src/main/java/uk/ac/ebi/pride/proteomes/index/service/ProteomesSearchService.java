@@ -222,8 +222,25 @@ public class ProteomesSearchService {
         return this.findByQueryAndFilterTaxid(query, taxIds, CPR).getTotalElements();
     }
 
-    public FacetPage<PeptiForm> facetProteinsTest1(int page, int size) {
-        return this.proteomesRepository.facetProteinsTest1(page, size);
+    public Page<FacetFieldEntry> getProteinCounts(int page, int size, boolean sortByIndex) {
+        return this.proteomesRepository.getProteinCounts(page, size, sortByIndex);
+    }
+    public Page<FacetFieldEntry> getProteinCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean sortByIndex) {
+        return this.proteomesRepository.getProteinCountsBySpecies(taxids, page, size, sortByIndex);
+    }
+
+    public Page<FacetFieldEntry> getUPGroupCounts(int page, int size, boolean sortByIndex) {
+        return this.proteomesRepository.getUPGroupCounts(page, size, sortByIndex);
+    }
+    public Page<FacetFieldEntry> getUPGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean sortByIndex) {
+        return this.proteomesRepository.getUPGroupCountsBySpecies(taxids, page, size, sortByIndex);
+    }
+
+    public Page<FacetFieldEntry> getGeneGroupCounts(int page, int size, boolean sortByIndex) {
+        return this.proteomesRepository.getGeneGroupCounts(page, size, sortByIndex);
+    }
+    public Page<FacetFieldEntry> getGeneGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean sortByIndex) {
+        return this.proteomesRepository.getGeneGroupCountsBySpecies(taxids, page, size, sortByIndex);
     }
 
 }

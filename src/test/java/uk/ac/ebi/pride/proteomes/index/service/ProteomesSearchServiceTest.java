@@ -7,13 +7,14 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.solr.core.query.result.FacetPage;
+import org.springframework.data.solr.core.query.result.FacetFieldEntry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.pride.proteomes.index.model.PeptiForm;
@@ -22,6 +23,7 @@ import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,8 @@ public class ProteomesSearchServiceTest {
     private SolrServer server;
     @Resource
     private ProteomesSearchService proteomesSearchService;
+
+    private static final List<SolrInputDocument> docs = createTestDocs();
 
     // the data directory for our test collection (created by the tests)
     // ToDo: we should remove the temporary data dir after each test, but that causes the
@@ -108,7 +112,7 @@ public class ProteomesSearchServiceTest {
         }
 
         // insert test data
-        server.add(createTestDocs());
+        server.add(docs);
 
         // force the commit for testing purposes (avoids soft commit delay)
         server.commit();
@@ -747,10 +751,108 @@ public class ProteomesSearchServiceTest {
 
 
     @Test
-    public void testFacetProteins() {
-        FacetPage<PeptiForm> facets = proteomesSearchService.facetProteinsTest1(10, 9);
+    public void testGetProteinCounts() {
+        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getProteinCounts(0, 10, false);
+        // we have only 5 proteins, even if we have more PeptiForms
+        assertEquals(5, proteinCounts.getContent().size());
 
-        System.out.println("total elements: " + facets.getTotalElements());
+        for (FacetFieldEntry entry : proteinCounts.getContent()) {
+            if (entry.getValue().equalsIgnoreCase("P12345")) {
+                // only that protein has two PeptiForms
+                assertEquals(2, entry.getValueCount());
+            } else {
+                // all other proteis only have one PeptiForm
+                assertEquals(1, entry.getValueCount());
+            }
+        }
+
+        // we have only 5 different proteins, so the second page of size 5 has to be empty
+        proteinCounts = proteomesSearchService.getProteinCounts(1, 5, false);
+        assertEquals(0, proteinCounts.getContent().size());
+    }
+    @Test
+    public void testGetProteinCountsBySpecies() {
+        Collection<Integer> taxids = new ArrayList<Integer>();
+        taxids.add(TAXID_HUMAN);
+        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getProteinCountsBySpecies(taxids, 0, 10, false);
+        assertEquals(3, proteinCounts.getContent().size());
+
+        for (FacetFieldEntry entry : proteinCounts) {
+            assertEquals(1, entry.getValueCount());
+        }
+        taxids.add(TAXID_MOUSE);
+        proteinCounts = proteomesSearchService.getProteinCountsBySpecies(taxids, 0, 10, false);
+        assertEquals(4, proteinCounts.getContent().size());
+
+        taxids.add(TAXID_HBV);
+        proteinCounts = proteomesSearchService.getProteinCountsBySpecies(taxids, 0, 10, false);
+        assertEquals(5, proteinCounts.getContent().size());
+    }
+
+    @Test
+    public void testGetUPGroupCounts() {
+        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getUPGroupCounts(0, 10, false);
+        // we have only 4 proteins, even if we have more PeptiForms
+        assertEquals(4, proteinCounts.getContent().size());
+
+        for (FacetFieldEntry entry : proteinCounts.getContent()) {
+            if (entry.getValue().equalsIgnoreCase("P12345")) {
+                // only that protein has two PeptiForms
+                assertEquals(2, entry.getValueCount());
+            } else {
+                // all other proteis only have one PeptiForm
+                assertEquals(1, entry.getValueCount());
+            }
+        }
+
+        // we have only 4 different proteins, so the second page of size 4 has to be empty
+        proteinCounts = proteomesSearchService.getUPGroupCounts(1, 4, false);
+        assertEquals(0, proteinCounts.getContent().size());
+    }
+    @Test
+    public void testGetUPGroupCountsBySpecies() {
+        Collection<Integer> taxids = new ArrayList<Integer>();
+        taxids.add(TAXID_HUMAN);
+        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getUPGroupCountsBySpecies(taxids, 0, 10, false);
+        assertEquals(3, proteinCounts.getContent().size());
+
+        for (FacetFieldEntry entry : proteinCounts.getContent()) {
+                assertEquals(1, entry.getValueCount());
+        }
+
+        taxids.clear();
+        taxids.add(TAXID_MOUSE);
+        proteinCounts = proteomesSearchService.getUPGroupCountsBySpecies(taxids, 0, 10, false);
+        assertEquals(2, proteinCounts.getContent().size());
+    }
+
+    @Test
+    public void testGetGeneGroupCounts() {
+        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getGeneGroupCounts(0, 10, false);
+        assertEquals(2, proteinCounts.getContent().size());
+
+        for (FacetFieldEntry entry : proteinCounts.getContent()) {
+                assertEquals(1, entry.getValueCount());
+        }
+
+        proteinCounts = proteomesSearchService.getGeneGroupCounts(1, 2, false);
+        assertEquals(0, proteinCounts.getContent().size());
+    }
+    @Test
+    public void testGetGeneGroupCountsBySpecies() {
+        Collection<Integer> taxids = new ArrayList<Integer>();
+        taxids.add(TAXID_HUMAN);
+        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getGeneGroupCountsBySpecies(taxids, 0, 10, false);
+        assertEquals(2, proteinCounts.getContent().size());
+
+        for (FacetFieldEntry entry : proteinCounts.getContent()) {
+            assertEquals(1, entry.getValueCount());
+        }
+
+        taxids.clear();
+        taxids.add(TAXID_MOUSE);
+        proteinCounts = proteomesSearchService.getGeneGroupCountsBySpecies(taxids, 0, 10, false);
+        assertEquals(0, proteinCounts.getContent().size());
     }
 
 }
