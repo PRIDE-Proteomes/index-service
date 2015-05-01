@@ -43,7 +43,10 @@
     </organization>
 
     <properties>
-        <solrj.version>4.7.2</solrj.version>
+        <solrj.version>4.10.1</solrj.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
+        <spring.data.commons.version>1.10.0.RELEASE</spring.data.commons.version>
+        <spring.data.solr.version>1.4.0.RELEASE</spring.data.solr.version>
     </properties>
 
     <build>
@@ -71,6 +74,12 @@
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-solr</artifactId>
+            <version>${spring.data.solr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <version>${spring.data.commons.version}</version>
         </dependency>
         <!-- Solr test framework -->
         <dependency>
@@ -90,6 +99,11 @@
             <artifactId>spring-test</artifactId>
             <version>${spring.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
         </dependency>
     </dependencies>
 
