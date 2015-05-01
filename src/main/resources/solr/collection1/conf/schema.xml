@@ -82,9 +82,10 @@
         <field name="peptiform_sequence"  type="lowercase"    indexed="true"  stored="true"  required="true"  multiValued="false"/>
         <field name="peptiform_taxid"     type="int"          indexed="true"  stored="true"  required="true"  multiValued="false"/>
         <field name="peptiform_species"   type="text_general" indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="mods"                type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+
         <field name="num_proteins"        type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
         <field name="proteins"            type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
-        <field name="mods"                type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
 
         <field name="num_up_groups"       type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
         <field name="up_groups"           type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
@@ -92,9 +93,10 @@
         <field name="gene_groups"         type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
         <field name="group_descs"         type="text_general" indexed="false" stored="false" required="false" multiValued="false"/>
 
-        <!-- ToDo: peptide length? (to allow range queries and sorting) -->
-        <!-- ToDo: modifications?  -->
-        <!-- ToDo: evidence/score -->
+        <!-- ToDo: peptide length (to allow range queries and sorting) -->
+        <!-- ToDo: modifications (take positions into account as they lead to different peptiforms!) -->
+        <!-- ToDo: evidences/scores -->
+        <!-- ToDo: annotations (tissue, disease, chromosome,... for enhanced querying and browsing) -->
 
 
         <!-- catchall field, containing all other searchable text fields
