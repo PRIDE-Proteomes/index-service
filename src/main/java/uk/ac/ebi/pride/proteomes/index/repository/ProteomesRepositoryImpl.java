@@ -123,7 +123,10 @@ public class ProteomesRepositoryImpl implements ProteomesRepositoryCustom {
         statsQuery.setStatsOptions(statsOptions);
         StatsPage<PeptiForm> statsPage = solrTemplate.queryForStatsPage(statsQuery, PeptiForm.class);
         FieldStatsResult priceStatResult = statsPage.getFieldStatsResult(facetField);
-        long totalCountStats = priceStatResult.getDistinctCount();
+        long totalCountStats = 0;
+        if (priceStatResult != null) {
+            totalCountStats = priceStatResult.getDistinctCount();
+        }
 
 
         // we don't want to return the full facet page, so we extract the bits we want
