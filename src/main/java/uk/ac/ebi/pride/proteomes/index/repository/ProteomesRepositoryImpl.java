@@ -6,12 +6,12 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.core.query.result.*;
 import org.springframework.stereotype.Repository;
-import uk.ac.ebi.pride.proteomes.index.model.PeptiForm;
+import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
 
 import javax.annotation.Resource;
 import java.util.*;
 
-import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm.*;
+import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform.*;
 
 /**
  * @author florian@ebi.ac.uk
@@ -93,7 +93,7 @@ public class ProteomesRepositoryImpl implements ProteomesRepositoryCustom {
         }
         // searchValues cannot be null to create a valid criteria
         if (searchValues == null) {
-            searchValues = new ArrayList<String>(0);
+            searchValues = new ArrayList<String>(1);
             // not needed to set a default value,
             // empty list = match all
         }
@@ -102,32 +102,32 @@ public class ProteomesRepositoryImpl implements ProteomesRepositoryCustom {
         facetQuery.setFacetOptions(options);
         facetQuery.setPageRequest(new PageRequest(0, 1));
 
-        FacetPage<PeptiForm> facetPage = solrTemplate.queryForFacetPage(facetQuery, PeptiForm.class);
+        FacetPage<Peptiform> facetPage = solrTemplate.queryForFacetPage(facetQuery, Peptiform.class);
 
         FacetOptions options2 = new FacetOptions(facetField);
         options2.setFacetLimit(10000000);
         FacetQuery facetQuery2 = facetQuery.setFacetOptions(options2);
-        FacetPage<PeptiForm> facetPage2 = solrTemplate.queryForFacetPage(facetQuery2, PeptiForm.class);
+        FacetPage<Peptiform> facetPage2 = solrTemplate.queryForFacetPage(facetQuery2, Peptiform.class);
 
         long totalCount = facetPage2.getFacetResultPage(facetField).getContent().size();
 
 
         // stats version
-        StatsOptions statsOptions = new StatsOptions()
-                .addField(facetField)
-                .setSelectiveCalcDistinct(true)
-                .setCalcDistinct(true);
-
-
-        SimpleQuery statsQuery = new SimpleQuery(criteria);
-        statsQuery.setStatsOptions(statsOptions);
-        StatsPage<PeptiForm> statsPage = solrTemplate.queryForStatsPage(statsQuery, PeptiForm.class);
-        FieldStatsResult priceStatResult = statsPage.getFieldStatsResult(facetField);
-        long totalCountStats = 0;
-        if (priceStatResult != null) {
-            totalCountStats = priceStatResult.getDistinctCount();
-        }
-
+//        StatsOptions statsOptions = new StatsOptions()
+//                .addField(facetField)
+//                .setSelectiveCalcDistinct(true)
+//                .setCalcDistinct(true);
+//
+//
+//        SimpleQuery statsQuery = new SimpleQuery(criteria);
+//        statsQuery.setStatsOptions(statsOptions);
+//        StatsPage<Peptiform> statsPage = solrTemplate.queryForStatsPage(statsQuery, Peptiform.class);
+//        FieldStatsResult priceStatResult = statsPage.getFieldStatsResult(facetField);
+//        long totalCountStats = 0;
+//        if (priceStatResult != null) {
+//            totalCountStats = priceStatResult.getDistinctCount();
+//        }
+//
 
         // we don't want to return the full facet page, so we extract the bits we want
         Page<FacetFieldEntry> tempPage = facetPage.getFacetResultPage(facetField);

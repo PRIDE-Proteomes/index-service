@@ -11,7 +11,7 @@ import java.util.List;
  * @author florian@ebi.ac.uk
  */
 @SuppressWarnings("UnusedDeclaration")
-public class PeptiForm implements SolrPeptiForm {
+public class Peptiform implements SolrPeptiform {
 
     @Id
     @Field(ID)

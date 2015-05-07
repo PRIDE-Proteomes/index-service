@@ -5,7 +5,7 @@ package uk.ac.ebi.pride.proteomes.index.model;
  *
  * @author florian@ebi.ac.uk
  */
-public interface SolrPeptiForm {
+public interface SolrPeptiform {
 
     public static final String ID = "id";
     public static final String PEPTIFORM_SEQUENCE = "peptiform_sequence";

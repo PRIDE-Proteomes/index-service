@@ -1,8 +1,8 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
 import org.apache.solr.common.SolrInputDocument;
-import uk.ac.ebi.pride.proteomes.index.model.PeptiForm;
-import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiForm;
+import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,16 +99,16 @@ public class TestData {
 
     private static SolrInputDocument createDoc(String id, String sequence, int taxid, String species, List<String> proteins) {
         SolrInputDocument doc = new SolrInputDocument();
-        doc.addField(SolrPeptiForm.ID, id);
-        doc.addField(SolrPeptiForm.PEPTIFORM_SEQUENCE, sequence);
-        doc.addField(SolrPeptiForm.PEPTIFORM_TAXID, taxid);
-        doc.addField(SolrPeptiForm.PEPTIFORM_SPECIES, species);
+        doc.addField(SolrPeptiform.ID, id);
+        doc.addField(SolrPeptiform.PEPTIFORM_SEQUENCE, sequence);
+        doc.addField(SolrPeptiform.PEPTIFORM_TAXID, taxid);
+        doc.addField(SolrPeptiform.PEPTIFORM_SPECIES, species);
         if (proteins != null) {
-            doc.addField(SolrPeptiForm.PROTEINS, proteins);
-            doc.addField(SolrPeptiForm.NUM_PROTEINS, proteins.size());
+            doc.addField(SolrPeptiform.PROTEINS, proteins);
+            doc.addField(SolrPeptiform.NUM_PROTEINS, proteins.size());
         } else { // default values
-            doc.addField(SolrPeptiForm.PROTEINS, null);
-            doc.addField(SolrPeptiForm.NUM_PROTEINS, 0);
+            doc.addField(SolrPeptiform.PROTEINS, null);
+            doc.addField(SolrPeptiform.NUM_PROTEINS, 0);
         }
         return doc;
     }
@@ -120,65 +120,65 @@ public class TestData {
         solrDocuments.add(TestData.createDoc(PEPTIDE_2_FORM_1_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         solrDocuments.add(TestData.createDoc(PEPTIDE_2_FORM_2_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         SolrInputDocument peptide3 = TestData.createDoc(PEPTIDE_3_FORM_1_ID, PEPTIDE_3_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, PEPTIDE_3_PROTEINS);
-        peptide3.addField(SolrPeptiForm.NUM_UP_GROUPS, PEPTIDE_3_UP_GROUPS.size());
-        peptide3.addField(SolrPeptiForm.UP_GROUPS, PEPTIDE_3_UP_GROUPS);
-        peptide3.addField(SolrPeptiForm.NUM_GENE_GROUPS, PEPTIDE_3_GENE_GROUPS.size());
-        peptide3.addField(SolrPeptiForm.GENE_GROUPS, PEPTIDE_3_GENE_GROUPS);
-        peptide3.addField(SolrPeptiForm.GROUP_DESCS, GROUP_DESC_1 + "\t" + GROUP_DESC_2 + "\t" + GROUP_DESC_3);
+        peptide3.addField(SolrPeptiform.NUM_UP_GROUPS, PEPTIDE_3_UP_GROUPS.size());
+        peptide3.addField(SolrPeptiform.UP_GROUPS, PEPTIDE_3_UP_GROUPS);
+        peptide3.addField(SolrPeptiform.NUM_GENE_GROUPS, PEPTIDE_3_GENE_GROUPS.size());
+        peptide3.addField(SolrPeptiform.GENE_GROUPS, PEPTIDE_3_GENE_GROUPS);
+        peptide3.addField(SolrPeptiform.GROUP_DESCS, GROUP_DESC_1 + "\t" + GROUP_DESC_2 + "\t" + GROUP_DESC_3);
         solrDocuments.add(peptide3);
         solrDocuments.add(TestData.createDoc(PEPTIDE_4_FORM_1_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         SolrInputDocument peptide4_2 = TestData.createDoc(PEPTIDE_4_FORM_2_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null);
-        peptide4_2.addField(SolrPeptiForm.MODS, PEPTIDE_4_MODS);
+        peptide4_2.addField(SolrPeptiform.MODS, PEPTIDE_4_MODS);
         solrDocuments.add(peptide4_2);
         solrDocuments.add(TestData.createDoc(PEPTIDE_4_FORM_3_ID, PEPTIDE_4_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, null));
         SolrInputDocument peptide5 = TestData.createDoc(PEPTIDE_5_FORM_1_ID, PEPTIDE_5_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, PEPTIDE_5_PROTEINS);
-        peptide5.addField(SolrPeptiForm.NUM_UP_GROUPS, PEPTIDE_5_UP_GROUPS.size());
-        peptide5.addField(SolrPeptiForm.UP_GROUPS, PEPTIDE_5_UP_GROUPS);
+        peptide5.addField(SolrPeptiform.NUM_UP_GROUPS, PEPTIDE_5_UP_GROUPS.size());
+        peptide5.addField(SolrPeptiform.UP_GROUPS, PEPTIDE_5_UP_GROUPS);
         solrDocuments.add(peptide5);
         solrDocuments.add(TestData.createDoc(PEPTIDE_6_FORM_1_ID, PEPTIDE_6_SEQUENCE, TAXID_HBV,   SPECIES_HBV,   PEPTIDE_6_PROTEINS));
         return solrDocuments;
     }
 
-    private static PeptiForm createPeptiForm(String id, String sequence, int taxid, String species, List<String> proteins) {
-        PeptiForm peptiForm = new PeptiForm();
-        peptiForm.setId(id);
-        peptiForm.setSequence(sequence);
-        peptiForm.setTaxid(taxid);
-        peptiForm.setSpecies(species);
+    private static Peptiform createPeptiForm(String id, String sequence, int taxid, String species, List<String> proteins) {
+        Peptiform peptiform = new Peptiform();
+        peptiform.setId(id);
+        peptiform.setSequence(sequence);
+        peptiform.setTaxid(taxid);
+        peptiform.setSpecies(species);
         if (proteins != null) {
-            peptiForm.setProteins(proteins);
-            peptiForm.setNumProteins(proteins.size());
+            peptiform.setProteins(proteins);
+            peptiform.setNumProteins(proteins.size());
         } else {
-            peptiForm.setProteins(null);
-            peptiForm.setNumProteins(0);
+            peptiform.setProteins(null);
+            peptiform.setNumProteins(0);
         }
-        return peptiForm;
+        return peptiform;
     }
 
-    public static List<PeptiForm> createTestPeptiForms() {
-        List<PeptiForm> peptiForms = new ArrayList<PeptiForm>(10);
-        peptiForms.add(TestData.createPeptiForm(PEPTIDE_1_FORM_1_ID, PEPTIDE_1_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
-        peptiForms.add(TestData.createPeptiForm(PEPTIDE_1_FORM_2_ID, PEPTIDE_1_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
-        peptiForms.add(TestData.createPeptiForm(PEPTIDE_2_FORM_1_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
-        peptiForms.add(TestData.createPeptiForm(PEPTIDE_2_FORM_2_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
-        PeptiForm peptide3 = TestData.createPeptiForm(PEPTIDE_3_FORM_1_ID, PEPTIDE_3_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, PEPTIDE_3_PROTEINS);
+    public static List<Peptiform> createTestPeptiForms() {
+        List<Peptiform> peptiforms = new ArrayList<Peptiform>(10);
+        peptiforms.add(TestData.createPeptiForm(PEPTIDE_1_FORM_1_ID, PEPTIDE_1_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
+        peptiforms.add(TestData.createPeptiForm(PEPTIDE_1_FORM_2_ID, PEPTIDE_1_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
+        peptiforms.add(TestData.createPeptiForm(PEPTIDE_2_FORM_1_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
+        peptiforms.add(TestData.createPeptiForm(PEPTIDE_2_FORM_2_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
+        Peptiform peptide3 = TestData.createPeptiForm(PEPTIDE_3_FORM_1_ID, PEPTIDE_3_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, PEPTIDE_3_PROTEINS);
         peptide3.setUpGroups(PEPTIDE_3_UP_GROUPS);
         peptide3.setNumUpGroups(PEPTIDE_3_UP_GROUPS.size());
         peptide3.setGeneGroups(PEPTIDE_3_GENE_GROUPS);
         peptide3.setNumGeneGroups(PEPTIDE_3_GENE_GROUPS.size());
         peptide3.setGroupDescs(GROUP_DESC_1 + "\t" + GROUP_DESC_2 + "\t" + GROUP_DESC_3);
-        peptiForms.add(peptide3);
-        peptiForms.add(TestData.createPeptiForm(PEPTIDE_4_FORM_1_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
-        PeptiForm peptide4_2 = TestData.createPeptiForm(PEPTIDE_4_FORM_2_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null);
+        peptiforms.add(peptide3);
+        peptiforms.add(TestData.createPeptiForm(PEPTIDE_4_FORM_1_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
+        Peptiform peptide4_2 = TestData.createPeptiForm(PEPTIDE_4_FORM_2_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null);
         peptide4_2.setMods(PEPTIDE_4_MODS);
-        peptiForms.add(peptide4_2);
-        peptiForms.add(TestData.createPeptiForm(PEPTIDE_4_FORM_3_ID, PEPTIDE_4_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, null));
-        PeptiForm peptide5 = TestData.createPeptiForm(PEPTIDE_5_FORM_1_ID, PEPTIDE_5_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, PEPTIDE_5_PROTEINS);
+        peptiforms.add(peptide4_2);
+        peptiforms.add(TestData.createPeptiForm(PEPTIDE_4_FORM_3_ID, PEPTIDE_4_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, null));
+        Peptiform peptide5 = TestData.createPeptiForm(PEPTIDE_5_FORM_1_ID, PEPTIDE_5_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, PEPTIDE_5_PROTEINS);
         peptide5.setUpGroups(PEPTIDE_5_UP_GROUPS);
         peptide5.setNumUpGroups(PEPTIDE_5_UP_GROUPS.size());
-        peptiForms.add(peptide5);
-        peptiForms.add(TestData.createPeptiForm(PEPTIDE_6_FORM_1_ID, PEPTIDE_6_SEQUENCE, TAXID_HBV, SPECIES_HBV,     PEPTIDE_6_PROTEINS));
-        return peptiForms;
+        peptiforms.add(peptide5);
+        peptiforms.add(TestData.createPeptiForm(PEPTIDE_6_FORM_1_ID, PEPTIDE_6_SEQUENCE, TAXID_HBV, SPECIES_HBV,     PEPTIDE_6_PROTEINS));
+        return peptiforms;
     }
 
 }

@@ -13,13 +13,15 @@
     <artifactId>index-service</artifactId>
     <packaging>jar</packaging>
     <version>0.0.2-SNAPSHOT</version>
-    <name>proteomes-index-service</name>
+
+    <name>PRIDE Proteomes Index Service</name>
+    <description>This package contains the web home for the PRIDE Proteomes project.</description>
+    <url>http://www.ebi.ac.uk/pride/proteomes</url>
 
     <!--
-        To build the project use:
-            mvn clean package
-    -->
-
+            To build the project use:
+                mvn clean package
+        -->
     <licenses>
         <license>
             <name>The Apache Software License 2.0</name>
@@ -43,10 +45,11 @@
     </organization>
 
     <properties>
-        <solrj.version>4.10.1</solrj.version>
-        <spring.version>4.1.6.RELEASE</spring.version>
-        <spring.data.commons.version>1.10.0.RELEASE</spring.data.commons.version>
-        <spring.data.solr.version>1.4.0.RELEASE</spring.data.solr.version>
+        <solrj.version>4.7.2</solrj.version>
+        <!--<solrj.version>4.10.1</solrj.version>-->
+        <!--<spring.version>4.1.6.RELEASE</spring.version>-->
+        <!--<spring.data.commons.version>1.10.0.RELEASE</spring.data.commons.version>-->
+        <!--<spring.data.solr.version>1.4.0.RELEASE</spring.data.solr.version>-->
     </properties>
 
     <build>
