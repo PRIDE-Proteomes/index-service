@@ -1,6 +1,10 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +14,7 @@ import org.springframework.data.solr.core.query.SimpleStringCriteria;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
 
 import javax.annotation.Resource;
 
@@ -24,8 +29,6 @@ import static uk.ac.ebi.pride.proteomes.index.service.TestData.*;
 @ContextConfiguration(classes = {TestContext.class})
 public class ProteomesIndexServiceTest {
 
-//    @Resource
-//    private SolrServer server;
     @Resource
     private ProteomesIndexService proteomesIndexService;
 
@@ -59,30 +62,33 @@ public class ProteomesIndexServiceTest {
      */
     @Test
     public void testSaveAndDelete() throws SolrServerException {
+
+        SolrServer server = solrOperations.getSolrServer();
+
         // first insert the test data
-//        proteomesIndexService.save(createTestPeptiForms());
-//        // and check if all records are there
-//        QueryResponse response = solrOperations.query(new SolrQuery("*"));
-//        assertEquals(COUNT_TOTAL_DOCS, response.getResults().getNumFound());
-//
-//        // do some spot checks
-//        // search for a specific record by ID
-//        response = server.query(new SolrQuery(SolrPeptiform.ID+":"+ ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID)));
-//        assertEquals(1, response.getResults().getNumFound());
-//        assertEquals(PEPTIDE_1_FORM_1_ID, response.getBeans(Peptiform.class).get(0).getId());
-//        // delete a specific record by ID
-//        proteomesIndexService.delete(PEPTIDE_1_FORM_1_ID);
-//        response = server.query(new SolrQuery("*"));
-//        assertEquals(COUNT_TOTAL_DOCS-1, response.getResults().getNumFound());
-//        // search by general keyword
-//        response = server.query(new SolrQuery(SolrPeptiform.TEXT+":human"));
-//        assertEquals(HUMAN_RECORDS-1+HBV_RECORDS, response.getResults().getNumFound());
-//
-//        // finally remove all records
-//        proteomesIndexService.deleteAll();
-//        // and check that the index is empty
-//        response = server.query(new SolrQuery("*"));
-//        assertEquals(0, response.getResults().getNumFound());
+        proteomesIndexService.save(createTestPeptiForms());
+        // and check if all records are there
+        QueryResponse response = server.query(new SolrQuery("*"));
+        assertEquals(COUNT_TOTAL_DOCS, response.getResults().getNumFound());
+
+        // do some spot checks
+        // search for a specific record by ID
+        response = server.query(new SolrQuery(SolrPeptiform.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID)));
+        assertEquals(1, response.getResults().getNumFound());
+        assertEquals(PEPTIDE_1_FORM_1_ID, response.getBeans(Peptiform.class).get(0).getId());
+        // delete a specific record by ID
+        proteomesIndexService.delete(PEPTIDE_1_FORM_1_ID);
+        response = server.query(new SolrQuery("*"));
+        assertEquals(COUNT_TOTAL_DOCS-1, response.getResults().getNumFound());
+        // search by general keyword
+        response = server.query(new SolrQuery(SolrPeptiform.TEXT+":human"));
+        assertEquals(HUMAN_RECORDS-1+HBV_RECORDS, response.getResults().getNumFound());
+
+        // finally remove all records
+        proteomesIndexService.deleteAll();
+        // and check that the index is empty
+        response = server.query(new SolrQuery("*"));
+        assertEquals(0, response.getResults().getNumFound());
 
     }
 

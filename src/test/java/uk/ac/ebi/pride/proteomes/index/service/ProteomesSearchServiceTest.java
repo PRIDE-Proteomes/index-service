@@ -1,8 +1,14 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.SolrParams;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +22,7 @@ import org.springframework.data.solr.core.query.result.FacetFieldEntry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -29,14 +36,10 @@ import static uk.ac.ebi.pride.proteomes.index.service.TestData.*;
 
 /**
  * @author florian@ebi.ac.uk
- *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {TestContext.class})
 public class ProteomesSearchServiceTest {
-
-//    @Resource
-//    private SolrServer server;
 
     @Resource
     SolrTemplate solrOperations;
@@ -46,71 +49,12 @@ public class ProteomesSearchServiceTest {
 
     private static final List<SolrInputDocument> docs = createTestDocs();
 
-    // the data directory for our test collection (created by the tests)
-    // ToDo: we should remove the temporary data dir after each test, but that causes the
-    // ToDo: Solr server/container to fault. We have to first solve that...
-//    private static final File dataDir = new File("src/main/resources/solr/collection1/data");
-
-
-//    @BeforeClass
-//    public static void initialise() throws Exception {
-//        // we want to start from scratch, so we make sure there is no old data
-//        if (dataDir.exists()) {
-//            FileUtils.deleteDirectory(dataDir);
-//        }
-//    }
-
-//    @AfterClass
-//    public static void teardown() throws Exception {
-//        // clean up any data we may have left behind
-//        if (!dataDir.exists()) {
-//            System.out.println("Data directory does not exist!");
-//        } else {
-//            FileUtils.deleteDirectory(dataDir);
-//        }
-//    }
+    private SolrServer server;
 
     @Before
     public void setUp() throws Exception {
-//        System.out.println("Data dir exists: " + dataDir.exists());
-//        try {
-//            server.optimize();
-//        } catch (Exception e){
-//            System.out.println("optimise exception");
-//        }
-//        try {
-//            server.rollback();
-//        } catch (Exception e){
-//            System.out.println("rollback exception");
-//        }
-//        CoreContainer container = ((EmbeddedSolrServer) server).getCoreContainer();
-//        container.shutdown();
-//        container.load();
-//        container.reload("collection1");
 
-//        CoreContainer container = new CoreContainer("src/main/resources/solr");
-//        container.load();
-//        CoreContainer container = ((EmbeddedSolrServer) server).getCoreContainer();
-//        for (SolrCore core : container.getCores()) {
-//            System.out.println(":" + core.getName());
-//        }
-//        container.load();
-////        container.reload("collection1");
-//        System.out.println("shared? " + container.isShareSchema());
-//        System.out.println("Data dir exists: " + dataDir.exists());
-//        server.optimize();
-//        server.commit();
-//
-//        System.out.println("Collection1 loaded? " + container.isLoaded("collection1"));
-//        System.out.println("Collection1 loaded no close? " + container.isLoadedNotPendingClose("collection1"));
-//        server = new EmbeddedSolrServer(container, "collection1");
-
-        // make sure we don't have any old data kicking around
-//        try {
-//            server.deleteByQuery("*:*");
-//        } catch (Exception e) {
-//            System.out.println("delete exception");
-//        }
+        server = solrOperations.getSolrServer();
 
         // insert test data
         solrOperations.saveBeans(docs);
@@ -128,109 +72,106 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testEmptyIndex() throws SolrServerException, IOException {
-//        server.deleteByQuery("*:*");
-//        //make sure the changes are committed
-//        server.commit();
-//
-//        // query for everything (e.g. *)
-//        QueryResponse response = server.query(new SolrQuery("*"));
-//
-//        assertEquals(0, response.getResults().size());
+
+        server.deleteByQuery("*:*");
+        //make sure the changes are committed
+        server.commit();
+
+        // query for everything (e.g. *)
+        QueryResponse response = server.query(new SolrQuery("*"));
+
+        assertEquals(0, response.getResults().size());
     }
 
     @Test
     public void testThatAllResultsAreReturned() throws SolrServerException {
-//        SolrParams params = new SolrQuery("*");
-//        QueryResponse response = server.query(params);
-//        assertEquals(COUNT_TOTAL_DOCS, response.getResults().getNumFound());
+        SolrParams params = new SolrQuery("*");
+        QueryResponse response = server.query(params);
+        assertEquals(COUNT_TOTAL_DOCS, response.getResults().getNumFound());
     }
 
     @Test
     public void testThatNoResultsAreReturned() throws SolrServerException {
-//        SolrParams params = new SolrQuery("text that is not found");
-//        QueryResponse response = server.query(params);
-//        assertEquals(0, response.getResults().getNumFound());
+        SolrParams params = new SolrQuery("text that is not found");
+        QueryResponse response = server.query(params);
+        assertEquals(0, response.getResults().getNumFound());
     }
-
 
 
     @Test
     public void testQueryByAccession() throws Exception {
         // we need to escape the peptiform IDs as they contain reserved special characters
-//        SolrParams params = new SolrQuery(SolrPeptiform.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID));
-//        QueryResponse response = server.query(params);
-//        // we expect exactly one result for a query by ID
-//        assertEquals(1, response.getResults().getNumFound());
-//        assertEquals(PEPTIDE_1_FORM_1_ID, response.getResults().get(0).get(SolrPeptiform.ID));
+        SolrParams params = new SolrQuery(SolrPeptiform.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID));
+        QueryResponse response = server.query(params);
+        // we expect exactly one result for a query by ID
+        assertEquals(1, response.getResults().getNumFound());
+        assertEquals(PEPTIDE_1_FORM_1_ID, response.getResults().get(0).get(SolrPeptiform.ID));
     }
 
     @Test
     public void testQueryBySequence() throws SolrServerException {
-//        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_SEQUENCE + ":" + PEPTIDE_1_SEQUENCE);
-//        QueryResponse response = server.query(params);
-//        // we expect two documents, since we have two PeptiForms with that sequence
-//        assertEquals(2, response.getResults().getNumFound());
-//        SolrDocument one = response.getResults().get(0);
-//        SolrDocument two = response.getResults().get(1);
-//        // both results need to have the sequence we have queried for
-//        assertEquals(PEPTIDE_1_SEQUENCE, one.get(SolrPeptiform.PEPTIFORM_SEQUENCE));
-//        assertEquals(PEPTIDE_1_SEQUENCE, two.get(SolrPeptiform.PEPTIFORM_SEQUENCE));
-//        // both IDs need to contain the sequence we have queried for
-//        assertTrue(one.get(SolrPeptiform.ID).toString().contains(PEPTIDE_1_SEQUENCE));
-//        assertTrue(two.get(SolrPeptiform.ID).toString().contains(PEPTIDE_1_SEQUENCE));
+        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_SEQUENCE + ":" + PEPTIDE_1_SEQUENCE);
+        QueryResponse response = server.query(params);
+        // we expect two documents, since we have two PeptiForms with that sequence
+        assertEquals(2, response.getResults().getNumFound());
+        SolrDocument one = response.getResults().get(0);
+        SolrDocument two = response.getResults().get(1);
+        // both results need to have the sequence we have queried for
+        assertEquals(PEPTIDE_1_SEQUENCE, one.get(SolrPeptiform.PEPTIFORM_SEQUENCE));
+        assertEquals(PEPTIDE_1_SEQUENCE, two.get(SolrPeptiform.PEPTIFORM_SEQUENCE));
+        // both IDs need to contain the sequence we have queried for
+        assertTrue(one.get(SolrPeptiform.ID).toString().contains(PEPTIDE_1_SEQUENCE));
+        assertTrue(two.get(SolrPeptiform.ID).toString().contains(PEPTIDE_1_SEQUENCE));
     }
 
     @Test
     public void testQueryByTaxid() throws SolrServerException {
-//        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_TAXID + ":" + TAXID_HUMAN);
-//        QueryResponse response = server.query(params);
-//        // we expect 7 documents, since we have 7 PeptiForms with that taxid
-//        assertEquals(HUMAN_RECORDS, response.getResults().getNumFound());
-//        params = new SolrQuery(SolrPeptiform.PEPTIFORM_TAXID + ":" + TAXID_MOUSE);
-//        response = server.query(params);
-//        // we expect two documents, since we have two PeptiForms with that taxid
-//        assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
+        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_TAXID + ":" + TAXID_HUMAN);
+        QueryResponse response = server.query(params);
+        // we expect 7 documents, since we have 7 PeptiForms with that taxid
+        assertEquals(HUMAN_RECORDS, response.getResults().getNumFound());
+        params = new SolrQuery(SolrPeptiform.PEPTIFORM_TAXID + ":" + TAXID_MOUSE);
+        response = server.query(params);
+        // we expect two documents, since we have two PeptiForms with that taxid
+        assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
     }
 
     @Test
     public void testQueryBySpeciesName() throws SolrServerException {
-//        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":" + SPECIES_HUMAN);
-//        QueryResponse response = server.query(params);
-//        // service terms are tokenized, so we expect 8 documents,
-//        // we have 7 (human) and 1 (human louse) PeptiForms that match the service terms
-//        assertEquals(HUMAN_RECORDS+HBV_RECORDS, response.getResults().getNumFound());
-//        // same results if we only use (the matching) service token
-//        params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":human" );
-//        response = server.query(params);
-//        assertEquals(HUMAN_RECORDS+HBV_RECORDS, response.getResults().getNumFound());
-//
-//        params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":" + SPECIES_MOUSE);
-//        response = server.query(params);
-//        // we expect two documents, since we have two PeptiForms with that species name
-//        assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
+        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":" + SPECIES_HUMAN);
+        QueryResponse response = server.query(params);
+        // service terms are tokenized, so we expect 8 documents,
+        // we have 7 (human) and 1 (human louse) PeptiForms that match the service terms
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
+        // same results if we only use (the matching) service token
+        params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":human");
+        response = server.query(params);
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
+
+        params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":" + SPECIES_MOUSE);
+        response = server.query(params);
+        // we expect two documents, since we have two PeptiForms with that species name
+        assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
     }
 
     @Test
     public void testQueryByText() throws SolrServerException {
-//        SolrParams params = new SolrQuery("text:*human*");
-//        QueryResponse response = server.query(params);
-//        // we expect 8 documents, since we have 7 human and 1 human louse PeptiForms
-//        assertEquals(HUMAN_RECORDS+HBV_RECORDS, response.getResults().getNumFound());
-//
-//
-//        params = new SolrQuery("text:P12345");
-//        response = server.query(params);
-//        // we expect 2 documents, since we have 2 peptiforms linked to this protein
-//        assertEquals(2, response.getResults().getNumFound());
+        SolrParams params = new SolrQuery("text:*human*");
+        QueryResponse response = server.query(params);
+        // we expect 8 documents, since we have 7 human and 1 human louse PeptiForms
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
 
+
+        params = new SolrQuery("text:P12345");
+        response = server.query(params);
+        // we expect 2 documents, since we have 2 peptiforms linked to this protein
+        assertEquals(2, response.getResults().getNumFound());
     }
-
-
 
     @Test
     public void testFindAll() {
         // request a page that is big enough to contain all records
-        Page<Peptiform> result = proteomesSearchService.findAll(new PageRequest(0, COUNT_TOTAL_DOCS+2));
+        Page<Peptiform> result = proteomesSearchService.findAll(new PageRequest(0, COUNT_TOTAL_DOCS + 2));
         assertEquals(COUNT_TOTAL_DOCS, result.getTotalElements());
     }
 
@@ -243,7 +184,7 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testFindBySequence() {
-        Page<Peptiform> page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE, new PageRequest(0,10));
+        Page<Peptiform> page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE, new PageRequest(0, 10));
         assertEquals(2, page.getTotalElements());
         // we convert toUpperCase internally, so we expect the same results independent of capitalisation
         page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE.toLowerCase(), new PageRequest(0, 10));
@@ -257,13 +198,12 @@ public class ProteomesSearchServiceTest {
         assertEquals(PEPTIDE_1_SEQUENCE, sequence);
 
         // we only find exact matches, no match if the query is super sequence
-        page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE+"A", new PageRequest(0, 10));
+        page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE + "A", new PageRequest(0, 10));
         assertEquals(0, page.getTotalElements());
 
         // we only find exact matches, no match if the query is partial sequence
         page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE.substring(2), new PageRequest(0, 10));
         assertEquals(0, page.getTotalElements());
-
     }
 
     @Test
@@ -285,11 +225,11 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testFindBySpecies() {
         // 9606 and 121225 contain the same keyword/token 'human', so we expect to find both records
-        Page<Peptiform> page = proteomesSearchService.findBySpecies(SPECIES_HUMAN, new PageRequest(0,10));
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, page.getTotalElements());
+        Page<Peptiform> page = proteomesSearchService.findBySpecies(SPECIES_HUMAN, new PageRequest(0, 10));
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findBySpecies(SPECIES_HBV, new PageRequest(0, 10));
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, page.getTotalElements());
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         // no other species contains the same keywords/token as mouse, so we expect only those records
         page = proteomesSearchService.findBySpecies(SPECIES_MOUSE, new PageRequest(0, 10));
@@ -298,7 +238,7 @@ public class ProteomesSearchServiceTest {
         // partial strings are supported, so we expect more results than only for 9606!
         // Homo sapiens and human louse are matching
         page = proteomesSearchService.findBySpecies("human", new PageRequest(0, 10));
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, page.getTotalElements());
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         // we don't expect to match partial words/tokens
         page = proteomesSearchService.findBySpecies("ouse", new PageRequest(0, 10));
@@ -308,10 +248,10 @@ public class ProteomesSearchServiceTest {
 
         // human louse and mouse match the following service term
         page = proteomesSearchService.findBySpecies("*ouse", new PageRequest(0, 10));
-        assertEquals(MOUSE_RECORDS+HBV_RECORDS, page.getTotalElements());
+        assertEquals(MOUSE_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findBySpecies("?ouse", new PageRequest(0, 10));
-        assertEquals(MOUSE_RECORDS+HBV_RECORDS, page.getTotalElements());
+        assertEquals(MOUSE_RECORDS + HBV_RECORDS, page.getTotalElements());
     }
 
     @Test
@@ -332,14 +272,14 @@ public class ProteomesSearchServiceTest {
             assertTrue(peptiform.getProteins().contains("P12345"));
         }
         // same with paged query (restrict to one result)
-        list = proteomesSearchService.findByProtein("P12345", new PageRequest(0,1)).getContent();
+        list = proteomesSearchService.findByProtein("P12345", new PageRequest(0, 1)).getContent();
         assertEquals(1, list.size());
 
         list = proteomesSearchService.findAllByProtein("P12347");
         assertEquals(1, list.size());
         assertEquals(PEPTIDE_3_FORM_1_ID, list.get(0).getId());
         // same with paged query
-        list = proteomesSearchService.findByProtein("P12347", new PageRequest(0,10)).getContent();
+        list = proteomesSearchService.findByProtein("P12347", new PageRequest(0, 10)).getContent();
         assertEquals(1, list.size());
         assertEquals(PEPTIDE_3_FORM_1_ID, list.get(0).getId());
 
@@ -354,7 +294,7 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testFindByMod() {
         String mod = "Oxidation";
-        Page<Peptiform> page = proteomesSearchService.findByMod(mod, new PageRequest(0,10));
+        Page<Peptiform> page = proteomesSearchService.findByMod(mod, new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
         Peptiform peptiform = page.getContent().get(0);
@@ -371,7 +311,7 @@ public class ProteomesSearchServiceTest {
             assertTrue(peptiform.getProteins().contains("P12345"));
         }
         // same with paged query (restricted to one result)
-        list = proteomesSearchService.findByUpGroup("P12345", new PageRequest(0,1)).getContent();
+        list = proteomesSearchService.findByUpGroup("P12345", new PageRequest(0, 1)).getContent();
         assertEquals(1, list.size());
         assertTrue(list.get(0).getUpGroups().contains("P12345"));
         assertTrue(list.get(0).getProteins().contains("P12345"));
@@ -381,22 +321,21 @@ public class ProteomesSearchServiceTest {
         assertTrue(list.get(0).getGeneGroups().contains("GENE1"));
 
         // same with paged query
-        list = proteomesSearchService.findByGeneGroup("GENE1", new PageRequest(0,1)).getContent();
+        list = proteomesSearchService.findByGeneGroup("GENE1", new PageRequest(0, 1)).getContent();
         assertEquals(1, list.size());
-        list = proteomesSearchService.findByGeneGroup("GENE1", new PageRequest(1,1)).getContent();
+        list = proteomesSearchService.findByGeneGroup("GENE1", new PageRequest(1, 1)).getContent();
         assertEquals(0, list.size());
     }
-
 
 
     @Test
     public void testFindByQuery() {
         // service term(s) contains 'human' which matches 8 records
         Page<Peptiform> page = proteomesSearchService.findByQuery(SPECIES_HUMAN, new PageRequest(0, 10));
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, page.getTotalElements());
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findByQuery("human", new PageRequest(0, 10));
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, page.getTotalElements());
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findByQuery("homo", new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS, page.getTotalElements());
@@ -408,7 +347,7 @@ public class ProteomesSearchServiceTest {
         assertEquals(MOUSE_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findByQuery("?ouse", new PageRequest(0, 10));
-        assertEquals(MOUSE_RECORDS+HBV_RECORDS, page.getTotalElements());
+        assertEquals(MOUSE_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findByQuery("10090", new PageRequest(0, 10));
         assertEquals(MOUSE_RECORDS, page.getTotalElements());
@@ -484,7 +423,7 @@ public class ProteomesSearchServiceTest {
     public void testFindByQueryAndFilterTaxId() {
         List<Integer> species = new ArrayList<Integer>();
         species.add(TAXID_HUMAN);
-        Page<Peptiform> page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0,10));
+        Page<Peptiform> page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0, 10));
         assertEquals(7, page.getTotalElements());
         // we only expect Homo sapiens (9606) records
         for (Peptiform peptiform : page) {
@@ -493,38 +432,37 @@ public class ProteomesSearchServiceTest {
 
         // nothing is annotated with multiple species
         species.add(TAXID_HBV);
-        page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0,10));
+        page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0, 10));
         assertEquals(0, page.getTotalElements());
 
         species.clear();
         species.add(TAXID_HBV);
-        page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0,10));
+        page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
         Peptiform result = page.getContent().get(0);
         assertEquals(PEPTIDE_6_FORM_1_ID, result.getId());
 
         // without species filter we expect the same result as a normal search
-        long countFilter = proteomesSearchService.findByQueryAndFilterTaxid("human", null, new PageRequest(0,10)).getTotalElements();
+        long countFilter = proteomesSearchService.findByQueryAndFilterTaxid("human", null, new PageRequest(0, 10)).getTotalElements();
         long count = proteomesSearchService.findByQuery("human", new PageRequest(0, 10)).getTotalElements();
         assertEquals(countFilter, count);
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, count);
 
         species.clear();
 
-        page = proteomesSearchService.findByQueryAndFilterTaxid("P12347", species, new PageRequest(0,10));
+        page = proteomesSearchService.findByQueryAndFilterTaxid("P12347", species, new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
         species.add(TAXID_HUMAN);
-        page = proteomesSearchService.findByQueryAndFilterTaxid("*", species, new PageRequest(0,10));
+        page = proteomesSearchService.findByQueryAndFilterTaxid("*", species, new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.findByQueryAndFilterTaxid("", species, new PageRequest(0,10));
+        page = proteomesSearchService.findByQueryAndFilterTaxid("", species, new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS, page.getTotalElements());
 
-        page = proteomesSearchService.findByQueryAndFilterTaxid(null, species, new PageRequest(0,10));
+        page = proteomesSearchService.findByQueryAndFilterTaxid(null, species, new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS, page.getTotalElements());
     }
-
 
 
     @Test
@@ -554,16 +492,16 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testCountBySpecies() {
         long count = proteomesSearchService.countBySpecies(SPECIES_HUMAN);
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, count);
 
         count = proteomesSearchService.countBySpecies("human");
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, count);
 
         count = proteomesSearchService.countBySpecies("mouse");
         assertEquals(MOUSE_RECORDS, count);
 
         count = proteomesSearchService.countBySpecies("?ouse");
-        assertEquals(MOUSE_RECORDS+HBV_RECORDS, count);
+        assertEquals(MOUSE_RECORDS + HBV_RECORDS, count);
     }
 
     @Test
@@ -577,21 +515,21 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testCountByMod() {
-        Page<Peptiform> page = proteomesSearchService.findByMod("Oxidation", new PageRequest(0,10));
+        Page<Peptiform> page = proteomesSearchService.findByMod("Oxidation", new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
-        page = proteomesSearchService.findByMod("Phosphorylation", new PageRequest(0,10));
+        page = proteomesSearchService.findByMod("Phosphorylation", new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
-        page = proteomesSearchService.findByMod("Deamidation", new PageRequest(0,10));
+        page = proteomesSearchService.findByMod("Deamidation", new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
         // non-existing modification, no results!
-        page = proteomesSearchService.findByMod("foo", new PageRequest(0,10));
+        page = proteomesSearchService.findByMod("foo", new PageRequest(0, 10));
         assertEquals(0, page.getTotalElements());
 
         // now wildcards allowed
-        page = proteomesSearchService.findByMod("*", new PageRequest(0,10));
+        page = proteomesSearchService.findByMod("*", new PageRequest(0, 10));
         assertEquals(0, page.getTotalElements());
 
         // if an empty mod term is given we throw an exception
@@ -606,7 +544,7 @@ public class ProteomesSearchServiceTest {
         // if no mod term is given at all we throw an exception
         failed = false;
         try {
-            proteomesSearchService.findByMod(null, new PageRequest(0,10));
+            proteomesSearchService.findByMod(null, new PageRequest(0, 10));
         } catch (Exception e) {
             failed = true;
         }
@@ -626,10 +564,10 @@ public class ProteomesSearchServiceTest {
     public void testCount() {
         // service term(s) contains 'human' which matches 8 records
         long count = proteomesSearchService.countByQuery(SPECIES_HUMAN);
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, count);
 
         count = proteomesSearchService.countByQuery("human");
-        assertEquals(HUMAN_RECORDS+HBV_RECORDS, count);
+        assertEquals(HUMAN_RECORDS + HBV_RECORDS, count);
 
         count = proteomesSearchService.countByQuery("homo");
         assertEquals(HUMAN_RECORDS, count);
@@ -641,7 +579,7 @@ public class ProteomesSearchServiceTest {
         assertEquals(MOUSE_RECORDS, count);
 
         count = proteomesSearchService.countByQuery("?ouse");
-        assertEquals(MOUSE_RECORDS+HBV_RECORDS, count);
+        assertEquals(MOUSE_RECORDS + HBV_RECORDS, count);
 
         count = proteomesSearchService.countByQuery("10090");
         assertEquals(MOUSE_RECORDS, count);
@@ -727,7 +665,6 @@ public class ProteomesSearchServiceTest {
     }
 
 
-
     @Test
     public void testFindByQueryFacetAndFilterTaxid() {
         Map<Integer, Long> facets = proteomesSearchService.getTaxidFacetsByQuery("human");
@@ -755,7 +692,6 @@ public class ProteomesSearchServiceTest {
     }
 
 
-
     @Test
     public void testGetProteinCounts() {
         Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getProteinCounts(0, 10, false);
@@ -776,6 +712,7 @@ public class ProteomesSearchServiceTest {
         proteinCounts = proteomesSearchService.getProteinCounts(1, 5, false);
         assertEquals(0, proteinCounts.getContent().size());
     }
+
     @Test
     public void testGetProteinCountsBySpecies() {
         Collection<Integer> taxids = new ArrayList<Integer>();
@@ -815,6 +752,7 @@ public class ProteomesSearchServiceTest {
         proteinCounts = proteomesSearchService.getUPGroupCounts(1, 4, false);
         assertEquals(0, proteinCounts.getContent().size());
     }
+
     @Test
     public void testGetUPGroupCountsBySpecies() {
         Collection<Integer> taxids = new ArrayList<Integer>();
@@ -823,7 +761,7 @@ public class ProteomesSearchServiceTest {
         assertEquals(3, proteinCounts.getContent().size());
 
         for (FacetFieldEntry entry : proteinCounts.getContent()) {
-                assertEquals(1, entry.getValueCount());
+            assertEquals(1, entry.getValueCount());
         }
 
         taxids.clear();
@@ -838,12 +776,13 @@ public class ProteomesSearchServiceTest {
         assertEquals(2, proteinCounts.getContent().size());
 
         for (FacetFieldEntry entry : proteinCounts.getContent()) {
-                assertEquals(1, entry.getValueCount());
+            assertEquals(1, entry.getValueCount());
         }
 
         proteinCounts = proteomesSearchService.getGeneGroupCounts(1, 2, false);
         assertEquals(0, proteinCounts.getContent().size());
     }
+
     @Test
     public void testGetGeneGroupCountsBySpecies() {
         Collection<Integer> taxids = new ArrayList<Integer>();
