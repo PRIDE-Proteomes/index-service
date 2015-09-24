@@ -10,7 +10,7 @@
     <groupId>uk.ac.ebi.pride.proteomes</groupId>
     <artifactId>index-service</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <name>PRIDE Proteomes Index Service</name>
     <description>This package contains the web home for the PRIDE Proteomes project.</description>
@@ -128,7 +128,7 @@
         <connection>scm:git:github.com/PRIDE-Proteomes/index-service.git</connection>
         <developerConnection>scm:git:git@github.com:PRIDE-Proteomes/index-service.git</developerConnection>
         <url>https://github.com/PRIDE-Proteomes/index-service.git</url>
-        <tag>index-service-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
