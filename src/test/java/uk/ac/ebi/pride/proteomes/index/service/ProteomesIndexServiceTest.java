@@ -13,8 +13,8 @@ import org.springframework.data.solr.core.query.SimpleQuery;
 import org.springframework.data.solr.core.query.SimpleStringCriteria;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
 import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiformFields;
 
 import javax.annotation.Resource;
 
@@ -73,15 +73,15 @@ public class ProteomesIndexServiceTest {
 
         // do some spot checks
         // search for a specific record by ID
-        response = server.query(new SolrQuery(SolrPeptiform.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID)));
+        response = server.query(new SolrQuery(SolrPeptiformFields.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID)));
         assertEquals(1, response.getResults().getNumFound());
-        assertEquals(PEPTIDE_1_FORM_1_ID, response.getBeans(Peptiform.class).get(0).getId());
+        assertEquals(PEPTIDE_1_FORM_1_ID, response.getBeans(SolrPeptiform.class).get(0).getId());
         // delete a specific record by ID
         proteomesIndexService.delete(PEPTIDE_1_FORM_1_ID);
         response = server.query(new SolrQuery("*"));
         assertEquals(COUNT_TOTAL_DOCS-1, response.getResults().getNumFound());
         // search by general keyword
-        response = server.query(new SolrQuery(SolrPeptiform.TEXT+":human"));
+        response = server.query(new SolrQuery(SolrPeptiformFields.TEXT+":human"));
         assertEquals(HUMAN_RECORDS-1+HBV_RECORDS, response.getResults().getNumFound());
 
         // finally remove all records
@@ -106,24 +106,24 @@ public class ProteomesIndexServiceTest {
         assertEquals(new Long(COUNT_TOTAL_DOCS), proteomesSearchService.countAll());
 
         // retrieve a specific record
-        Peptiform peptiform = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
-        assertNotNull(peptiform);
+        SolrPeptiform solrPeptiform = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
+        assertNotNull(solrPeptiform);
         // check the existing record we want to change
-        int taxid = peptiform.getTaxid();
+        int taxid = solrPeptiform.getTaxid();
         assertEquals(TAXID_HUMAN, taxid);
 
         // now we manipulate the record...
         taxid += 1000;
-        peptiform.setTaxid(taxid);
+        solrPeptiform.setTaxid(taxid);
         // and save it back
-        proteomesIndexService.save(peptiform);
+        proteomesIndexService.save(solrPeptiform);
 
         // check that we still have the same number of records
         assertEquals(new Long(COUNT_TOTAL_DOCS), proteomesSearchService.countAll());
 
-        peptiform = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
-        assertNotNull(peptiform);
-        assertEquals(TAXID_HUMAN + 1000, peptiform.getTaxid());
+        solrPeptiform = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
+        assertNotNull(solrPeptiform);
+        assertEquals(TAXID_HUMAN + 1000, solrPeptiform.getTaxid());
     }
 
     /**
@@ -143,21 +143,21 @@ public class ProteomesIndexServiceTest {
         assertEquals(new Long(2), proteomesSearchService.countBySequence(PEPTIDE_1_SEQUENCE));
 
         // recreate the records (different objects) and pick one (not load from index)
-        Peptiform peptiform = new Peptiform();
+        SolrPeptiform solrPeptiform = new SolrPeptiform();
         // use an existing ID, but otherwise different data
-        peptiform.setId(PEPTIDE_1_FORM_1_ID);
-        peptiform.setTaxid(1000);
-        peptiform.setSpecies("A new species");
-        peptiform.setSequence("UNKNOWN");
+        solrPeptiform.setId(PEPTIDE_1_FORM_1_ID);
+        solrPeptiform.setTaxid(1000);
+        solrPeptiform.setSpecies("A new species");
+        solrPeptiform.setSequence("UNKNOWN");
         // and save it back (overwriting the existing record)
-        proteomesIndexService.save(peptiform);
+        proteomesIndexService.save(solrPeptiform);
 
         // check that we still have the same number of records
         assertEquals(new Long(COUNT_TOTAL_DOCS), proteomesSearchService.countAll());
 
-        peptiform = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
-        assertNotNull(peptiform);
-        assertEquals(1000, peptiform.getTaxid());
+        solrPeptiform = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
+        assertNotNull(solrPeptiform);
+        assertEquals(1000, solrPeptiform.getTaxid());
 
         assertEquals(new Long(1), proteomesSearchService.countByTaxid(1000));
         assertEquals(new Long(1), proteomesSearchService.countBySequence("UNKNOWN"));

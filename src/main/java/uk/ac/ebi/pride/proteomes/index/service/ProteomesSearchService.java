@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.solr.core.query.result.FacetFieldEntry;
 import org.springframework.data.solr.core.query.result.FacetPage;
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
 import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiformFields;
 import uk.ac.ebi.pride.proteomes.index.repository.ProteomesRepository;
 
 import javax.annotation.Resource;
@@ -53,7 +53,7 @@ public class ProteomesSearchService {
      * Global queries, query for all records
      */
 
-    public Page<Peptiform> findAll(Pageable pageable) {
+    public Page<SolrPeptiform> findAll(Pageable pageable) {
         return proteomesRepository.findAll(pageable);
     }
     public Long countAll() {
@@ -63,9 +63,9 @@ public class ProteomesSearchService {
     public Map<Integer, Long> getTaxidFacets() {
         Map<Integer, Long> facetMap = new HashMap<Integer, Long>();
 
-        FacetPage<Peptiform> facetPage = this.proteomesRepository.getTaxidFacets(new PageRequest(0,1));
+        FacetPage<SolrPeptiform> facetPage = this.proteomesRepository.getTaxidFacets(new PageRequest(0,1));
 
-        for (FacetFieldEntry entry : facetPage.getFacetResultPage(SolrPeptiform.PEPTIFORM_TAXID)) {
+        for (FacetFieldEntry entry : facetPage.getFacetResultPage(SolrPeptiformFields.PEPTIFORM_TAXID)) {
             facetMap.put(Integer.parseInt(entry.getValue()), entry.getValueCount());
         }
 
@@ -77,12 +77,12 @@ public class ProteomesSearchService {
      * Queries for specific fields
      */
 
-    public Peptiform findById(String id) {
+    public SolrPeptiform findById(String id) {
         return proteomesRepository.findOne(id);
     }
     // Note: countById does not make sense and existById is the same as findById != null
 
-    public Page<Peptiform> findBySequence(String sequence, Pageable pageable) {
+    public Page<SolrPeptiform> findBySequence(String sequence, Pageable pageable) {
         checkTerm(sequence);
         return proteomesRepository.findBySequence(sequence, pageable);
     }
@@ -90,7 +90,7 @@ public class ProteomesSearchService {
         return this.findBySequence(sequence, CPR).getTotalElements();
     }
 
-    public Page<Peptiform> findByTaxid(int taxid, Pageable pageable) {
+    public Page<SolrPeptiform> findByTaxid(int taxid, Pageable pageable) {
         if (taxid < 1) {
             throw new IllegalArgumentException("TaxId needs to be positive!");
         }
@@ -100,7 +100,7 @@ public class ProteomesSearchService {
         return this.findByTaxid(taxid, CPR).getTotalElements();
     }
 
-    public Page<Peptiform> findBySpecies(String species, Pageable pageable) {
+    public Page<SolrPeptiform> findBySpecies(String species, Pageable pageable) {
         checkTerm(species);
         return proteomesRepository.findBySpecies(species, pageable);
     }
@@ -108,11 +108,11 @@ public class ProteomesSearchService {
         return this.findBySpecies(species, CPR).getTotalElements();
     }
 
-    public Page<Peptiform> findByProtein(String proteinAccession, Pageable pageable) {
+    public Page<SolrPeptiform> findByProtein(String proteinAccession, Pageable pageable) {
         checkTerm(proteinAccession);
         return proteomesRepository.findByProteins(proteinAccession, pageable);
     }
-    public List<Peptiform> findAllByProtein(String proteinAccession) {
+    public List<SolrPeptiform> findAllByProtein(String proteinAccession) {
         checkTerm(proteinAccession);
         return proteomesRepository.findAllByProteins(proteinAccession);
     }
@@ -120,7 +120,7 @@ public class ProteomesSearchService {
         return this.findByProtein(proteinAccession, CPR).getTotalElements();
     }
 
-    public Page<Peptiform> findByMod(String mod, Pageable pageable) {
+    public Page<SolrPeptiform> findByMod(String mod, Pageable pageable) {
         checkTerm(mod);
         return this.proteomesRepository.findByMods(mod, pageable);
     }
@@ -128,24 +128,24 @@ public class ProteomesSearchService {
         return this.findByMod(mod, CPR).getTotalElements();
     }
 
-    public Page<Peptiform> findByNumProteinsGreaterThan(int num, Pageable page) {
+    public Page<SolrPeptiform> findByNumProteinsGreaterThan(int num, Pageable page) {
         return this.proteomesRepository.findByNumProteinsGreaterThan(num, page);
     }
     public long countByNumProteinsGreaterThan(int num) {
         return this.proteomesRepository.countByNumProteinsGreaterThan(num);
     }
-    public Page<Peptiform> findByNumProteinsLessThan(int num, Pageable page) {
+    public Page<SolrPeptiform> findByNumProteinsLessThan(int num, Pageable page) {
         return this.proteomesRepository.findByNumProteinsLessThan(num, page);
     }
     public long countByNumProteinsLessThan(int num) {
         return this.proteomesRepository.countByNumProteinsLessThan(num);
     }
 
-    public List<Peptiform> findAllByUpGroup(String upGroupId) {
+    public List<SolrPeptiform> findAllByUpGroup(String upGroupId) {
         checkTerm(upGroupId);
         return this.proteomesRepository.findAllByUpGroups(upGroupId);
     }
-    public Page<Peptiform> findByUpGroup(String upGroupId, Pageable pageable) {
+    public Page<SolrPeptiform> findByUpGroup(String upGroupId, Pageable pageable) {
         checkTerm(upGroupId);
         return this.proteomesRepository.findByUpGroups(upGroupId, pageable);
     }
@@ -153,11 +153,11 @@ public class ProteomesSearchService {
         return this.findByUpGroup(upGroupId, CPR).getTotalElements();
     }
 
-    public List<Peptiform> findAllByGeneGroup(String geneGroupId) {
+    public List<SolrPeptiform> findAllByGeneGroup(String geneGroupId) {
         checkTerm(geneGroupId);
         return this.proteomesRepository.findAllByGeneGroups(geneGroupId);
     }
-    public Page<Peptiform> findByGeneGroup(String geneGroupId, Pageable pageable) {
+    public Page<SolrPeptiform> findByGeneGroup(String geneGroupId, Pageable pageable) {
         checkTerm(geneGroupId);
         return this.proteomesRepository.findByGeneGroups(geneGroupId, pageable);
     }
@@ -170,7 +170,7 @@ public class ProteomesSearchService {
      * General queries, not field specific
      */
 
-    public Page<Peptiform> findByQuery(String query, Pageable pageable) {
+    public Page<SolrPeptiform> findByQuery(String query, Pageable pageable) {
         // if we don't have a query term return everything
         if (query == null || query.trim().isEmpty()) {
             return proteomesRepository.findAll(pageable);
@@ -187,8 +187,8 @@ public class ProteomesSearchService {
         if (query == null || query.trim().isEmpty()) {
             facetMap = getTaxidFacets();
         } else {
-            FacetPage<Peptiform> facetPage = this.proteomesRepository.findByQueryFacetTaxid(query, new PageRequest(0, 1));
-            for (FacetFieldEntry entry : facetPage.getFacetResultPage(SolrPeptiform.PEPTIFORM_TAXID)) {
+            FacetPage<SolrPeptiform> facetPage = this.proteomesRepository.findByQueryFacetTaxid(query, new PageRequest(0, 1));
+            for (FacetFieldEntry entry : facetPage.getFacetResultPage(SolrPeptiformFields.PEPTIFORM_TAXID)) {
                 facetMap.put(Integer.parseInt(entry.getValue()), entry.getValueCount());
             }
         }
@@ -196,9 +196,9 @@ public class ProteomesSearchService {
         return facetMap;
     }
 
-    public Page<Peptiform> findByQueryNot(String query, Pageable pageable) {
+    public Page<SolrPeptiform> findByQueryNot(String query, Pageable pageable) {
         if (query == null || query.trim().isEmpty()) {
-            return new PageImpl<Peptiform>(Collections.<Peptiform>emptyList());
+            return new PageImpl<SolrPeptiform>(Collections.<SolrPeptiform>emptyList());
         }
         return proteomesRepository.findByQueryNot(query, pageable);
     }
@@ -207,7 +207,7 @@ public class ProteomesSearchService {
     }
 
 
-    public Page<Peptiform> findByQueryAndFilterTaxid(String query, Collection<Integer> taxIds, Pageable pageable) {
+    public Page<SolrPeptiform> findByQueryAndFilterTaxid(String query, Collection<Integer> taxIds, Pageable pageable) {
         if (taxIds == null || taxIds.isEmpty()) {
             // no filters, use the normal query
             return this.findByQuery(query, pageable);

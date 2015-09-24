@@ -21,8 +21,8 @@ import org.springframework.data.solr.core.query.SimpleStringCriteria;
 import org.springframework.data.solr.core.query.result.FacetFieldEntry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
 import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiformFields;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -101,36 +101,36 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testQueryByAccession() throws Exception {
         // we need to escape the peptiform IDs as they contain reserved special characters
-        SolrParams params = new SolrQuery(SolrPeptiform.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID));
+        SolrParams params = new SolrQuery(SolrPeptiformFields.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID));
         QueryResponse response = server.query(params);
         // we expect exactly one result for a query by ID
         assertEquals(1, response.getResults().getNumFound());
-        assertEquals(PEPTIDE_1_FORM_1_ID, response.getResults().get(0).get(SolrPeptiform.ID));
+        assertEquals(PEPTIDE_1_FORM_1_ID, response.getResults().get(0).get(SolrPeptiformFields.ID));
     }
 
     @Test
     public void testQueryBySequence() throws SolrServerException {
-        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_SEQUENCE + ":" + PEPTIDE_1_SEQUENCE);
+        SolrParams params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SEQUENCE + ":" + PEPTIDE_1_SEQUENCE);
         QueryResponse response = server.query(params);
         // we expect two documents, since we have two PeptiForms with that sequence
         assertEquals(2, response.getResults().getNumFound());
         SolrDocument one = response.getResults().get(0);
         SolrDocument two = response.getResults().get(1);
         // both results need to have the sequence we have queried for
-        assertEquals(PEPTIDE_1_SEQUENCE, one.get(SolrPeptiform.PEPTIFORM_SEQUENCE));
-        assertEquals(PEPTIDE_1_SEQUENCE, two.get(SolrPeptiform.PEPTIFORM_SEQUENCE));
+        assertEquals(PEPTIDE_1_SEQUENCE, one.get(SolrPeptiformFields.PEPTIFORM_SEQUENCE));
+        assertEquals(PEPTIDE_1_SEQUENCE, two.get(SolrPeptiformFields.PEPTIFORM_SEQUENCE));
         // both IDs need to contain the sequence we have queried for
-        assertTrue(one.get(SolrPeptiform.ID).toString().contains(PEPTIDE_1_SEQUENCE));
-        assertTrue(two.get(SolrPeptiform.ID).toString().contains(PEPTIDE_1_SEQUENCE));
+        assertTrue(one.get(SolrPeptiformFields.ID).toString().contains(PEPTIDE_1_SEQUENCE));
+        assertTrue(two.get(SolrPeptiformFields.ID).toString().contains(PEPTIDE_1_SEQUENCE));
     }
 
     @Test
     public void testQueryByTaxid() throws SolrServerException {
-        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_TAXID + ":" + TAXID_HUMAN);
+        SolrParams params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_TAXID + ":" + TAXID_HUMAN);
         QueryResponse response = server.query(params);
         // we expect 7 documents, since we have 7 PeptiForms with that taxid
         assertEquals(HUMAN_RECORDS, response.getResults().getNumFound());
-        params = new SolrQuery(SolrPeptiform.PEPTIFORM_TAXID + ":" + TAXID_MOUSE);
+        params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_TAXID + ":" + TAXID_MOUSE);
         response = server.query(params);
         // we expect two documents, since we have two PeptiForms with that taxid
         assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
@@ -138,17 +138,17 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testQueryBySpeciesName() throws SolrServerException {
-        SolrParams params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":" + SPECIES_HUMAN);
+        SolrParams params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SPECIES + ":" + SPECIES_HUMAN);
         QueryResponse response = server.query(params);
         // service terms are tokenized, so we expect 8 documents,
         // we have 7 (human) and 1 (human louse) PeptiForms that match the service terms
         assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
         // same results if we only use (the matching) service token
-        params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":human");
+        params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SPECIES + ":human");
         response = server.query(params);
         assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
 
-        params = new SolrQuery(SolrPeptiform.PEPTIFORM_SPECIES + ":" + SPECIES_MOUSE);
+        params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SPECIES + ":" + SPECIES_MOUSE);
         response = server.query(params);
         // we expect two documents, since we have two PeptiForms with that species name
         assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
@@ -171,20 +171,20 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testFindAll() {
         // request a page that is big enough to contain all records
-        Page<Peptiform> result = proteomesSearchService.findAll(new PageRequest(0, COUNT_TOTAL_DOCS + 2));
+        Page<SolrPeptiform> result = proteomesSearchService.findAll(new PageRequest(0, COUNT_TOTAL_DOCS + 2));
         assertEquals(COUNT_TOTAL_DOCS, result.getTotalElements());
     }
 
     @Test
     public void testFindById() {
-        Peptiform result = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
+        SolrPeptiform result = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
         assertNotNull(result);
         assertEquals(PEPTIDE_1_FORM_1_ID, result.getId());
     }
 
     @Test
     public void testFindBySequence() {
-        Page<Peptiform> page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE, new PageRequest(0, 10));
         assertEquals(2, page.getTotalElements());
         // we convert toUpperCase internally, so we expect the same results independent of capitalisation
         page = proteomesSearchService.findBySequence(PEPTIDE_1_SEQUENCE.toLowerCase(), new PageRequest(0, 10));
@@ -208,7 +208,7 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testFindByTaxid() {
-        Page<Peptiform> page = proteomesSearchService.findByTaxid(TAXID_HUMAN, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findByTaxid(TAXID_HUMAN, new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findByTaxid(TAXID_MOUSE, new PageRequest(0, 10));
@@ -225,7 +225,7 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testFindBySpecies() {
         // 9606 and 121225 contain the same keyword/token 'human', so we expect to find both records
-        Page<Peptiform> page = proteomesSearchService.findBySpecies(SPECIES_HUMAN, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findBySpecies(SPECIES_HUMAN, new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findBySpecies(SPECIES_HBV, new PageRequest(0, 10));
@@ -256,7 +256,7 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testFindBySpeciesCaseSensitivity() {
-        Page<Peptiform> page = proteomesSearchService.findBySpecies(SPECIES_MOUSE, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findBySpecies(SPECIES_MOUSE, new PageRequest(0, 10));
         assertEquals(MOUSE_RECORDS, page.getTotalElements());
         page = proteomesSearchService.findBySpecies(SPECIES_MOUSE.toUpperCase(), new PageRequest(0, 10));
         assertEquals(MOUSE_RECORDS, page.getTotalElements());
@@ -266,10 +266,10 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testFindByProtein() {
-        List<Peptiform> list = proteomesSearchService.findAllByProtein("P12345");
+        List<SolrPeptiform> list = proteomesSearchService.findAllByProtein("P12345");
         assertEquals(2, list.size());
-        for (Peptiform peptiform : list) {
-            assertTrue(peptiform.getProteins().contains("P12345"));
+        for (SolrPeptiform solrPeptiform : list) {
+            assertTrue(solrPeptiform.getProteins().contains("P12345"));
         }
         // same with paged query (restrict to one result)
         list = proteomesSearchService.findByProtein("P12345", new PageRequest(0, 1)).getContent();
@@ -285,30 +285,30 @@ public class ProteomesSearchServiceTest {
 
         list = proteomesSearchService.findAllByProtein("P98765");
         assertEquals(1, list.size());
-        Peptiform peptiform = list.get(0);
-        assertFalse(peptiform.getProteins().isEmpty());
-        assertTrue(peptiform.getProteins().contains("P98765"));
+        SolrPeptiform solrPeptiform = list.get(0);
+        assertFalse(solrPeptiform.getProteins().isEmpty());
+        assertTrue(solrPeptiform.getProteins().contains("P98765"));
 
     }
 
     @Test
     public void testFindByMod() {
         String mod = "Oxidation";
-        Page<Peptiform> page = proteomesSearchService.findByMod(mod, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findByMod(mod, new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
-        Peptiform peptiform = page.getContent().get(0);
-        assertTrue(peptiform.getMods().contains(mod));
-        assertEquals(PEPTIDE_4_FORM_2_ID, peptiform.getId());
+        SolrPeptiform solrPeptiform = page.getContent().get(0);
+        assertTrue(solrPeptiform.getMods().contains(mod));
+        assertEquals(PEPTIDE_4_FORM_2_ID, solrPeptiform.getId());
     }
 
     @Test
     public void testFindByGroup() {
-        List<Peptiform> list = proteomesSearchService.findAllByUpGroup("P12345");
+        List<SolrPeptiform> list = proteomesSearchService.findAllByUpGroup("P12345");
         assertEquals(2, list.size());
-        for (Peptiform peptiform : list) {
-            assertTrue(peptiform.getUpGroups().contains("P12345"));
-            assertTrue(peptiform.getProteins().contains("P12345"));
+        for (SolrPeptiform solrPeptiform : list) {
+            assertTrue(solrPeptiform.getUpGroups().contains("P12345"));
+            assertTrue(solrPeptiform.getProteins().contains("P12345"));
         }
         // same with paged query (restricted to one result)
         list = proteomesSearchService.findByUpGroup("P12345", new PageRequest(0, 1)).getContent();
@@ -331,7 +331,7 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testFindByQuery() {
         // service term(s) contains 'human' which matches 8 records
-        Page<Peptiform> page = proteomesSearchService.findByQuery(SPECIES_HUMAN, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findByQuery(SPECIES_HUMAN, new PageRequest(0, 10));
         assertEquals(HUMAN_RECORDS + HBV_RECORDS, page.getTotalElements());
 
         page = proteomesSearchService.findByQuery("human", new PageRequest(0, 10));
@@ -383,14 +383,14 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testFindNot() {
-        Page<Peptiform> page = proteomesSearchService.findByQueryNot("Mouse", new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findByQueryNot("Mouse", new PageRequest(0, 10));
         assertEquals(COUNT_TOTAL_DOCS - MOUSE_RECORDS, page.getTotalElements());
     }
 
     @Test
     public void testFindByNumProteins() {
         // there is only one peptide with more than 2 proteins
-        Page<Peptiform> page = proteomesSearchService.findByNumProteinsGreaterThan(2, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findByNumProteinsGreaterThan(2, new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
         assertEquals(PEPTIDE_3_FORM_1_ID, page.getContent().get(0).getId());
 
@@ -423,11 +423,11 @@ public class ProteomesSearchServiceTest {
     public void testFindByQueryAndFilterTaxId() {
         List<Integer> species = new ArrayList<Integer>();
         species.add(TAXID_HUMAN);
-        Page<Peptiform> page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0, 10));
         assertEquals(7, page.getTotalElements());
         // we only expect Homo sapiens (9606) records
-        for (Peptiform peptiform : page) {
-            assertEquals(TAXID_HUMAN, peptiform.getTaxid());
+        for (SolrPeptiform solrPeptiform : page) {
+            assertEquals(TAXID_HUMAN, solrPeptiform.getTaxid());
         }
 
         // nothing is annotated with multiple species
@@ -439,7 +439,7 @@ public class ProteomesSearchServiceTest {
         species.add(TAXID_HBV);
         page = proteomesSearchService.findByQueryAndFilterTaxid("human", species, new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
-        Peptiform result = page.getContent().get(0);
+        SolrPeptiform result = page.getContent().get(0);
         assertEquals(PEPTIDE_6_FORM_1_ID, result.getId());
 
         // without species filter we expect the same result as a normal search
@@ -473,7 +473,7 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testIfExists() {
-        Peptiform result = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
+        SolrPeptiform result = proteomesSearchService.findById(PEPTIDE_1_FORM_1_ID);
         assertNotNull(result);
     }
 
@@ -515,7 +515,7 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testCountByMod() {
-        Page<Peptiform> page = proteomesSearchService.findByMod("Oxidation", new PageRequest(0, 10));
+        Page<SolrPeptiform> page = proteomesSearchService.findByMod("Oxidation", new PageRequest(0, 10));
         assertEquals(1, page.getTotalElements());
 
         page = proteomesSearchService.findByMod("Phosphorylation", new PageRequest(0, 10));

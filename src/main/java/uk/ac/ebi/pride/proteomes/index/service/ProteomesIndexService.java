@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
 import org.springframework.stereotype.Service;
-import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
 import uk.ac.ebi.pride.proteomes.index.repository.ProteomesRepository;
 
 import javax.annotation.Resource;
@@ -21,12 +21,12 @@ public class ProteomesIndexService {
         this.proteomesRepository.deleteAll();
     }
 
-    public void save(Peptiform peptiform) {
-        this.proteomesRepository.save(peptiform);
+    public void save(SolrPeptiform solrPeptiform) {
+        this.proteomesRepository.save(solrPeptiform);
     }
 
-    public void save(Collection<Peptiform> peptiforms) {
-        this.proteomesRepository.save(peptiforms);
+    public void save(Collection<SolrPeptiform> solrPeptiforms) {
+        this.proteomesRepository.save(solrPeptiforms);
     }
 
     public void delete(String id) {

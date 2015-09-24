@@ -6,12 +6,12 @@ import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.core.query.result.*;
 import org.springframework.stereotype.Repository;
-import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
 
 import javax.annotation.Resource;
 import java.util.*;
 
-import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform.*;
+import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiformFields.*;
 
 /**
  * @author florian@ebi.ac.uk
@@ -23,12 +23,11 @@ public class ProteomesRepositoryImpl implements ProteomesRepositoryCustom {
     @Resource
     SolrTemplate solrTemplate;
 
-
-
     @Override
     public Page<FacetFieldEntry> getProteinCounts(int page, int size, boolean soryByIndex) {
         return getCounts(PROTEINS, null, null, page, size, soryByIndex);
     }
+
     @Override
     public Page<FacetFieldEntry> getProteinCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex) {
         return getCounts(PROTEINS, PEPTIFORM_TAXID, createQueryValues(taxids), page, size, soryByIndex);
@@ -53,10 +52,6 @@ public class ProteomesRepositoryImpl implements ProteomesRepositoryCustom {
     public Page<FacetFieldEntry> getGeneGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex) {
         return getCounts(GENE_GROUPS, PEPTIFORM_TAXID, createQueryValues(taxids), page, size, soryByIndex);
     }
-
-
-
-
 
     private static List<String> createQueryValues(Collection<Integer> taxids) {
         List<String> values;
@@ -102,12 +97,12 @@ public class ProteomesRepositoryImpl implements ProteomesRepositoryCustom {
         facetQuery.setFacetOptions(options);
         facetQuery.setPageRequest(new PageRequest(0, 1));
 
-        FacetPage<Peptiform> facetPage = solrTemplate.queryForFacetPage(facetQuery, Peptiform.class);
+        FacetPage<SolrPeptiform> facetPage = solrTemplate.queryForFacetPage(facetQuery, SolrPeptiform.class);
 
         FacetOptions options2 = new FacetOptions(facetField);
         options2.setFacetLimit(10000000);
         FacetQuery facetQuery2 = facetQuery.setFacetOptions(options2);
-        FacetPage<Peptiform> facetPage2 = solrTemplate.queryForFacetPage(facetQuery2, Peptiform.class);
+        FacetPage<SolrPeptiform> facetPage2 = solrTemplate.queryForFacetPage(facetQuery2, SolrPeptiform.class);
 
         long totalCount = facetPage2.getFacetResultPage(facetField).getContent().size();
 

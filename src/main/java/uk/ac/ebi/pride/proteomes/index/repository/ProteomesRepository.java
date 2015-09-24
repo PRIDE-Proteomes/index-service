@@ -6,77 +6,77 @@ import org.springframework.data.solr.core.query.result.FacetPage;
 import org.springframework.data.solr.repository.Facet;
 import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SolrCrudRepository;
-import uk.ac.ebi.pride.proteomes.index.model.Peptiform;
+import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
 
 import java.util.Collection;
 import java.util.List;
 
 import static org.springframework.data.solr.core.query.Query.Operator.AND;
-import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform.*;
+import static uk.ac.ebi.pride.proteomes.index.model.SolrPeptiformFields.*;
 
 /**
  * @author florian@ebi.ac.uk
  *
  * Note: using the Query annotation allows wildcards to go straight into the query
  */
-public interface ProteomesRepository extends SolrCrudRepository<Peptiform, String>, ProteomesRepositoryCustom {
+public interface ProteomesRepository extends SolrCrudRepository<SolrPeptiform, String>, ProteomesRepositoryCustom {
 
     /*
      * Global queries, query for all records
      */
 
-    Page<Peptiform> findAll(Pageable pageable);
+    Page<SolrPeptiform> findAll(Pageable pageable);
 
     @Facet(fields = {PEPTIFORM_TAXID}, limit = 100)
-    @Query(value = Peptiform.TEXT + ":*")
-    FacetPage<Peptiform> getTaxidFacets(Pageable pageable);
+    @Query(value = SolrPeptiform.TEXT + ":*")
+    FacetPage<SolrPeptiform> getTaxidFacets(Pageable pageable);
 
 
     /*
      * Queries for specific fields
      */
 
-    Page<Peptiform> findBySequence(String sequence, Pageable pageable);
+    Page<SolrPeptiform> findBySequence(String sequence, Pageable pageable);
 
-    Page<Peptiform> findByTaxid(int taxid, Pageable pageable);
+    Page<SolrPeptiform> findByTaxid(int taxid, Pageable pageable);
 
     @Query(value = PEPTIFORM_SPECIES+":?0")
-    Page<Peptiform> findBySpecies(String species, Pageable pageable);
+    Page<SolrPeptiform> findBySpecies(String species, Pageable pageable);
 
-    Page<Peptiform> findByProteins(String proteinAcc, Pageable pageable);
-    List<Peptiform> findAllByProteins(String proteinAcc);
+    Page<SolrPeptiform> findByProteins(String proteinAcc, Pageable pageable);
+    List<SolrPeptiform> findAllByProteins(String proteinAcc);
 
-    Page<Peptiform> findByMods(String mod, Pageable pageable);
+    Page<SolrPeptiform> findByMods(String mod, Pageable pageable);
 
-    Page<Peptiform> findByNumProteinsGreaterThan(int num, Pageable page);
+    Page<SolrPeptiform> findByNumProteinsGreaterThan(int num, Pageable page);
     long countByNumProteinsGreaterThan(int num);
 
-    Page<Peptiform> findByNumProteinsLessThan(int num, Pageable page);
+    Page<SolrPeptiform> findByNumProteinsLessThan(int num, Pageable page);
     long countByNumProteinsLessThan(int num);
 
-    List<Peptiform> findAllByUpGroups(String upGroupId);
-    Page<Peptiform> findByUpGroups(String upGroupId, Pageable pageable);
+    List<SolrPeptiform> findAllByUpGroups(String upGroupId);
+    Page<SolrPeptiform> findByUpGroups(String upGroupId, Pageable pageable);
 
-    List<Peptiform> findAllByGeneGroups(String geneGroupId);
-    Page<Peptiform> findByGeneGroups(String geneGroupId, Pageable pageable);
+    List<SolrPeptiform> findAllByGeneGroups(String geneGroupId);
+    Page<SolrPeptiform> findByGeneGroups(String geneGroupId, Pageable pageable);
 
 
     /*
      * General queries, not field specific
      */
 
-    @Query(value = Peptiform.TEXT + ":?0")
-    Page<Peptiform> findByQuery(String query, Pageable pageable);
+    @Query(value = SolrPeptiform.TEXT + ":?0")
+    Page<SolrPeptiform> findByQuery(String query, Pageable pageable);
 
     @Facet(fields = {PEPTIFORM_TAXID}, limit = 100)
-    @Query(value = Peptiform.TEXT + ":?0")
-    FacetPage<Peptiform> findByQueryFacetTaxid(String query, Pageable pageable);
+    @Query(value = SolrPeptiform.TEXT + ":?0")
+    FacetPage<SolrPeptiform> findByQueryFacetTaxid(String query, Pageable pageable);
 
     @Query(value = "-"+ TEXT + ":?0")
-    Page<Peptiform> findByQueryNot(String query, Pageable pageable);
+    Page<SolrPeptiform> findByQueryNot(String query, Pageable pageable);
 
     @Query(value = TEXT+":?0", filters = PEPTIFORM_TAXID+":(?1)", defaultOperator = AND)
-    Page<Peptiform> findByQueryAndFilterTaxid(String query, Collection<Integer> taxIds, Pageable pageable);
+    Page<SolrPeptiform> findByQueryAndFilterTaxid(String query, Collection<Integer> taxIds, Pageable pageable);
 
 
 }
