@@ -1,6 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -12,7 +10,7 @@
     <groupId>uk.ac.ebi.pride.proteomes</groupId>
     <artifactId>index-service</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>PRIDE Proteomes Index Service</name>
     <description>This package contains the web home for the PRIDE Proteomes project.</description>
@@ -130,7 +128,7 @@
         <connection>scm:git:github.com/PRIDE-Proteomes/index-service.git</connection>
         <developerConnection>scm:git:git@github.com:PRIDE-Proteomes/index-service.git</developerConnection>
         <url>https://github.com/PRIDE-Proteomes/index-service.git</url>
-        <tag>HEAD</tag>
+        <tag>index-service-1.0.0</tag>
     </scm>
 
     <distributionManagement>
