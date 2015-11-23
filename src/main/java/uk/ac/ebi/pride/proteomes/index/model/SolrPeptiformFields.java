@@ -13,11 +13,13 @@ public interface SolrPeptiformFields {
     public static final String PEPTIFORM_SPECIES = "peptiform_species";
     public static final String TEXT = "text";
     public static final String NUM_PROTEINS = "num_proteins";
-    public static final String PROTEINS = "proteins";
-    public static final String MODS = "mods";
-    public static final String NUM_UP_GROUPS = "num_up_groups";
-    public static final String UP_GROUPS = "up_groups";
+    public static final String PROTEIN_ACCESSION = "protein_accession";
+    public static final String PROTEIN_NAME = "protein_name";
+    public static final String PROTEIN_DESCRIPTION = "protein_description";
+
+    public static final String MOD = "mod";
+
     public static final String NUM_GENE_GROUPS = "num_gene_groups";
-    public static final String GENE_GROUPS = "gene_groups";
-    public static final String GROUP_DESCS = "group_descs";
+    public static final String GENE_GROUP = "gene_group";
+    public static final String GENE_GROUP_DESCRIPTION = "gene_group_description";
 }

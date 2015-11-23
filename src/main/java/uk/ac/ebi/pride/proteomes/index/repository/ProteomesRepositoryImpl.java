@@ -25,32 +25,22 @@ public class ProteomesRepositoryImpl implements ProteomesRepositoryCustom {
 
     @Override
     public Page<FacetFieldEntry> getProteinCounts(int page, int size, boolean soryByIndex) {
-        return getCounts(PROTEINS, null, null, page, size, soryByIndex);
+        return getCounts(PROTEIN_ACCESSION, null, null, page, size, soryByIndex);
     }
 
     @Override
     public Page<FacetFieldEntry> getProteinCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex) {
-        return getCounts(PROTEINS, PEPTIFORM_TAXID, createQueryValues(taxids), page, size, soryByIndex);
-    }
-
-    @Override
-    public Page<FacetFieldEntry> getUPGroupCounts(int page, int size, boolean soryByIndex) {
-        return getCounts(UP_GROUPS, null, null, page, size, soryByIndex);
-    }
-
-    @Override
-    public Page<FacetFieldEntry> getUPGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex) {
-        return getCounts(UP_GROUPS, PEPTIFORM_TAXID, createQueryValues(taxids), page, size, soryByIndex);
+        return getCounts(PROTEIN_ACCESSION, PEPTIFORM_TAXID, createQueryValues(taxids), page, size, soryByIndex);
     }
 
     @Override
     public Page<FacetFieldEntry> getGeneGroupCounts(int page, int size, boolean soryByIndex) {
-        return getCounts(GENE_GROUPS, null, null, page, size, soryByIndex);
+        return getCounts(GENE_GROUP, null, null, page, size, soryByIndex);
     }
 
     @Override
     public Page<FacetFieldEntry> getGeneGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex) {
-        return getCounts(GENE_GROUPS, PEPTIFORM_TAXID, createQueryValues(taxids), page, size, soryByIndex);
+        return getCounts(GENE_GROUP, PEPTIFORM_TAXID, createQueryValues(taxids), page, size, soryByIndex);
     }
 
     private static List<String> createQueryValues(Collection<Integer> taxids) {

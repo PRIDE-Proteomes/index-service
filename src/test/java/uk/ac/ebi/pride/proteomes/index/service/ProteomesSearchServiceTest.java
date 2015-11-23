@@ -266,28 +266,28 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testFindByProtein() {
-        List<SolrPeptiform> list = proteomesSearchService.findAllByProtein("P12345");
+        List<SolrPeptiform> list = proteomesSearchService.findAllByProteinAccession("P12345");
         assertEquals(2, list.size());
         for (SolrPeptiform solrPeptiform : list) {
-            assertTrue(solrPeptiform.getProteins().contains("P12345"));
+            assertTrue(solrPeptiform.getProteinAccession().contains("P12345"));
         }
         // same with paged query (restrict to one result)
-        list = proteomesSearchService.findByProtein("P12345", new PageRequest(0, 1)).getContent();
+        list = proteomesSearchService.findByProteinAccession("P12345", new PageRequest(0, 1)).getContent();
         assertEquals(1, list.size());
 
-        list = proteomesSearchService.findAllByProtein("P12347");
+        list = proteomesSearchService.findAllByProteinAccession("P12347");
         assertEquals(1, list.size());
         assertEquals(PEPTIDE_3_FORM_1_ID, list.get(0).getId());
         // same with paged query
-        list = proteomesSearchService.findByProtein("P12347", new PageRequest(0, 10)).getContent();
+        list = proteomesSearchService.findByProteinAccession("P12347", new PageRequest(0, 10)).getContent();
         assertEquals(1, list.size());
         assertEquals(PEPTIDE_3_FORM_1_ID, list.get(0).getId());
 
-        list = proteomesSearchService.findAllByProtein("P98765");
+        list = proteomesSearchService.findAllByProteinAccession("P98765");
         assertEquals(1, list.size());
         SolrPeptiform solrPeptiform = list.get(0);
-        assertFalse(solrPeptiform.getProteins().isEmpty());
-        assertTrue(solrPeptiform.getProteins().contains("P98765"));
+        assertFalse(solrPeptiform.getProteinAccession().isEmpty());
+        assertTrue(solrPeptiform.getProteinAccession().contains("P98765"));
 
     }
 
@@ -298,27 +298,15 @@ public class ProteomesSearchServiceTest {
         assertEquals(1, page.getTotalElements());
 
         SolrPeptiform solrPeptiform = page.getContent().get(0);
-        assertTrue(solrPeptiform.getMods().contains(mod));
+        assertTrue(solrPeptiform.getMod().contains(mod));
         assertEquals(PEPTIDE_4_FORM_2_ID, solrPeptiform.getId());
     }
 
     @Test
     public void testFindByGroup() {
-        List<SolrPeptiform> list = proteomesSearchService.findAllByUpGroup("P12345");
-        assertEquals(2, list.size());
-        for (SolrPeptiform solrPeptiform : list) {
-            assertTrue(solrPeptiform.getUpGroups().contains("P12345"));
-            assertTrue(solrPeptiform.getProteins().contains("P12345"));
-        }
-        // same with paged query (restricted to one result)
-        list = proteomesSearchService.findByUpGroup("P12345", new PageRequest(0, 1)).getContent();
+        List<SolrPeptiform> list = proteomesSearchService.findAllByGeneGroup("GENE1");
         assertEquals(1, list.size());
-        assertTrue(list.get(0).getUpGroups().contains("P12345"));
-        assertTrue(list.get(0).getProteins().contains("P12345"));
-
-        list = proteomesSearchService.findAllByGeneGroup("GENE1");
-        assertEquals(1, list.size());
-        assertTrue(list.get(0).getGeneGroups().contains("GENE1"));
+        assertTrue(list.get(0).getGeneGroup().contains("GENE1"));
 
         // same with paged query
         list = proteomesSearchService.findByGeneGroup("GENE1", new PageRequest(0, 1)).getContent();
@@ -506,10 +494,10 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testCountByProtein() {
-        long count = proteomesSearchService.countByProtein("P12345");
+        long count = proteomesSearchService.countByProteinAccession("P12345");
         assertEquals(2, count);
         // wildcards are not supported
-        count = proteomesSearchService.countByProtein("P????5");
+        count = proteomesSearchService.countByProteinAccession("P????5");
         assertEquals(0, count);
     }
 
@@ -553,10 +541,7 @@ public class ProteomesSearchServiceTest {
 
     @Test
     public void testCountByGroup() {
-        long count = proteomesSearchService.countByUpGroup("P12345");
-        assertEquals(2, count);
-
-        count = proteomesSearchService.countByGeneGroup("GENE1");
+        long count = proteomesSearchService.countByGeneGroup("GENE1");
         assertEquals(1, count);
     }
 
@@ -730,44 +715,6 @@ public class ProteomesSearchServiceTest {
         taxids.add(TAXID_HBV);
         proteinCounts = proteomesSearchService.getProteinCountsBySpecies(taxids, 0, 10, false);
         assertEquals(5, proteinCounts.getContent().size());
-    }
-
-    @Test
-    public void testGetUPGroupCounts() {
-        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getUPGroupCounts(0, 10, false);
-        // we have only 4 proteins, even if we have more PeptiForms
-        assertEquals(4, proteinCounts.getContent().size());
-
-        for (FacetFieldEntry entry : proteinCounts.getContent()) {
-            if (entry.getValue().equalsIgnoreCase("P12345")) {
-                // only that protein has two PeptiForms
-                assertEquals(2, entry.getValueCount());
-            } else {
-                // all other proteis only have one PeptiForm
-                assertEquals(1, entry.getValueCount());
-            }
-        }
-
-        // we have only 4 different proteins, so the second page of size 4 has to be empty
-        proteinCounts = proteomesSearchService.getUPGroupCounts(1, 4, false);
-        assertEquals(0, proteinCounts.getContent().size());
-    }
-
-    @Test
-    public void testGetUPGroupCountsBySpecies() {
-        Collection<Integer> taxids = new ArrayList<Integer>();
-        taxids.add(TAXID_HUMAN);
-        Page<FacetFieldEntry> proteinCounts = proteomesSearchService.getUPGroupCountsBySpecies(taxids, 0, 10, false);
-        assertEquals(3, proteinCounts.getContent().size());
-
-        for (FacetFieldEntry entry : proteinCounts.getContent()) {
-            assertEquals(1, entry.getValueCount());
-        }
-
-        taxids.clear();
-        taxids.add(TAXID_MOUSE);
-        proteinCounts = proteomesSearchService.getUPGroupCountsBySpecies(taxids, 0, 10, false);
-        assertEquals(2, proteinCounts.getContent().size());
     }
 
     @Test

@@ -78,20 +78,20 @@
            trailing underscores (e.g. _version_) are reserved.
         -->
 
-        <field name="id"                  type="string"       indexed="true"  stored="true"  required="true"  multiValued="false"/>
-        <field name="peptiform_sequence"  type="lowercase"    indexed="true"  stored="true"  required="true"  multiValued="false"/>
-        <field name="peptiform_taxid"     type="int"          indexed="true"  stored="true"  required="true"  multiValued="false"/>
-        <field name="peptiform_species"   type="text_general" indexed="true"  stored="true"  required="false" multiValued="false"/>
-        <field name="mods"                type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="id"                     type="string"       indexed="true"  stored="true"  required="true"  multiValued="false"/>
+        <field name="peptiform_sequence"     type="lowercase"    indexed="true"  stored="true"  required="true"  multiValued="false"/>
+        <field name="peptiform_taxid"        type="int"          indexed="true"  stored="true"  required="true"  multiValued="false"/>
+        <field name="peptiform_species"      type="text_general" indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="mod"                    type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
 
-        <field name="num_proteins"        type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
-        <field name="proteins"            type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="num_proteins"           type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="protein_accession"      type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="protein_name"           type="text_general" indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="protein_description"    type="text_general" indexed="true"  stored="true"  required="false" multiValued="true"/>
 
-        <field name="num_up_groups"       type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
-        <field name="up_groups"           type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
-        <field name="num_gene_groups"     type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
-        <field name="gene_groups"         type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
-        <field name="group_descs"         type="text_general" indexed="false" stored="false" required="false" multiValued="false"/>
+        <field name="num_gene_groups"        type="int"          indexed="true"  stored="true"  required="false" multiValued="false"/>
+        <field name="gene_group"             type="string"       indexed="true"  stored="true"  required="false" multiValued="true"/>
+        <field name="gene_group_description" type="text_general" indexed="true"  stored="true"  required="false" multiValued="true"/>
 
         <!-- ToDo: peptide length (to allow range queries and sorting) -->
         <!-- ToDo: modifications (take positions into account as they lead to different peptiforms!) -->
@@ -131,15 +131,17 @@
           is added to the index.  It's used either to index the same field differently,
           or to add multiple fields to the same field for easier/faster searching.  -->
 
-    <copyField source="id"                  dest="text"/>
-    <copyField source="peptiform_sequence"  dest="text"/>
-    <copyField source="peptiform_taxid"     dest="text"/>
-    <copyField source="peptiform_species"   dest="text"/>
-    <copyField source="proteins"            dest="text"/>
-    <copyField source="up_groups"           dest="text"/>
-    <copyField source="gene_groups"         dest="text"/>
-    <copyField source="group_descs"         dest="text"/>
-    <copyField source="mods"                dest="text"/>
+    <copyField source="id"                     dest="text"/>
+    <copyField source="peptiform_sequence"     dest="text"/>
+    <copyField source="peptiform_taxid"        dest="text"/>
+    <copyField source="peptiform_species"      dest="text"/>
+    <copyField source="protein_accession"      dest="text"/>
+    <copyField source="protein_name"           dest="text"/>
+    <copyField source="protein_description"    dest="text"/>
+    <copyField source="gene_group"             dest="text"/>
+    <copyField source="gene_group_description" dest="text"/>
+    <copyField source="mod"                    dest="text"/>
+
 
     <types>
         <!-- field type definitions. The "name" attribute is

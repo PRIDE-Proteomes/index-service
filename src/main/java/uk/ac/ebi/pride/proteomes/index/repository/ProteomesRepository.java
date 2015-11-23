@@ -43,10 +43,10 @@ public interface ProteomesRepository extends SolrCrudRepository<SolrPeptiform, S
     @Query(value = PEPTIFORM_SPECIES+":?0")
     Page<SolrPeptiform> findBySpecies(String species, Pageable pageable);
 
-    Page<SolrPeptiform> findByProteins(String proteinAcc, Pageable pageable);
-    List<SolrPeptiform> findAllByProteins(String proteinAcc);
+    Page<SolrPeptiform> findByProteinAccession(String proteinAcc, Pageable pageable);
+    List<SolrPeptiform> findAllByProteinAccession(String proteinAcc);
 
-    Page<SolrPeptiform> findByMods(String mod, Pageable pageable);
+    Page<SolrPeptiform> findByMod(String mod, Pageable pageable);
 
     Page<SolrPeptiform> findByNumProteinsGreaterThan(int num, Pageable page);
     long countByNumProteinsGreaterThan(int num);
@@ -54,11 +54,8 @@ public interface ProteomesRepository extends SolrCrudRepository<SolrPeptiform, S
     Page<SolrPeptiform> findByNumProteinsLessThan(int num, Pageable page);
     long countByNumProteinsLessThan(int num);
 
-    List<SolrPeptiform> findAllByUpGroups(String upGroupId);
-    Page<SolrPeptiform> findByUpGroups(String upGroupId, Pageable pageable);
-
-    List<SolrPeptiform> findAllByGeneGroups(String geneGroupId);
-    Page<SolrPeptiform> findByGeneGroups(String geneGroupId, Pageable pageable);
+    List<SolrPeptiform> findAllByGeneGroup(String geneGroupId);
+    Page<SolrPeptiform> findByGeneGroup(String geneGroupId, Pageable pageable);
 
 
     /*

@@ -29,26 +29,29 @@ public class SolrPeptiform implements SolrPeptiformFields {
     @Field(NUM_PROTEINS)
     private int numProteins;
 
-    @Field(PROTEINS)
-    private List<String> proteins;
+    @Field(PROTEIN_ACCESSION)
+    private List<String> proteinAccession;
 
-    @Field(MODS)
-    private List<String> mods;
+    @Field(PROTEIN_NAME)
+    private List<String> proteinName;
 
-    @Field(NUM_UP_GROUPS)
-    private int numUpGroups;
+    @Field(PROTEIN_DESCRIPTION)
+    private List<String> proteinDescription;
 
-    @Field(UP_GROUPS)
-    private List<String> upGroups;
+    @Field(MOD)
+    private List<String> mod;
 
     @Field(NUM_GENE_GROUPS)
     private int numGeneGroups;
 
-    @Field(GENE_GROUPS)
-    private List<String> geneGroups;
+    @Field(GENE_GROUP)
+    private List<String> geneGroup;
 
-    @Field(GROUP_DESCS)
-    private String groupDescs;
+    @Field(GENE_GROUP_DESCRIPTION)
+    private List<String> geneGroupDescription;
+    private List<String> proteinGeneSymbol;
+    private List<String> proteinEvidence;
+    private List<String> proteinAltName;
 
 
     public String getId() {
@@ -91,36 +94,36 @@ public class SolrPeptiform implements SolrPeptiformFields {
         this.numProteins = numProteins;
     }
 
-    public List<String> getProteins() {
-        return proteins;
+    public List<String> getProteinAccession() {
+        return proteinAccession;
     }
 
-    public void setProteins(List<String> proteins) {
-        this.proteins = proteins;
+    public void setProteinAccession(List<String> proteinAccession) {
+        this.proteinAccession = proteinAccession;
     }
 
-    public List<String> getMods() {
-        return mods;
+    public List<String> getProteinName() {
+        return proteinName;
     }
 
-    public void setMods(List<String> mods) {
-        this.mods = mods;
+    public void setProteinName(List<String> proteinName) {
+        this.proteinName = proteinName;
     }
 
-    public int getNumUpGroups() {
-        return numUpGroups;
+    public List<String> getProteinDescription() {
+        return proteinDescription;
     }
 
-    public void setNumUpGroups(int numUpGroups) {
-        this.numUpGroups = numUpGroups;
+    public void setProteinDescription(List<String> proteinDescription) {
+        this.proteinDescription = proteinDescription;
     }
 
-    public List<String> getUpGroups() {
-        return upGroups;
+    public List<String> getMod() {
+        return mod;
     }
 
-    public void setUpGroups(List<String> upGroups) {
-        this.upGroups = upGroups;
+    public void setMod(List<String> mod) {
+        this.mod = mod;
     }
 
     public int getNumGeneGroups() {
@@ -131,15 +134,43 @@ public class SolrPeptiform implements SolrPeptiformFields {
         this.numGeneGroups = numGeneGroups;
     }
 
-    public List<String> getGeneGroups() {
-        return geneGroups;
+    public List<String> getGeneGroup() {
+        return geneGroup;
     }
 
-    public void setGeneGroups(List<String> geneGroups) {
-        this.geneGroups = geneGroups;
+    public void setGeneGroup(List<String> geneGroup) {
+        this.geneGroup = geneGroup;
     }
 
-    public void setGroupDescs(String groupDescs) {
-        this.groupDescs = groupDescs;
+    public List<String> getGeneGroupDescription() {
+        return geneGroupDescription;
+    }
+
+    public void setGeneGroupDescription(List<String> geneGroupDescription) {
+        this.geneGroupDescription = geneGroupDescription;
+    }
+
+    public void setProteinGeneSymbol(List<String> proteinGeneSymbol) {
+        this.proteinGeneSymbol = proteinGeneSymbol;
+    }
+
+    public List<String> getProteinGeneSymbol() {
+        return proteinGeneSymbol;
+    }
+
+    public void setProteinEvidence(List<String> proteinEvidence) {
+        this.proteinEvidence = proteinEvidence;
+    }
+
+    public List<String> getProteinEvidence() {
+        return proteinEvidence;
+    }
+
+    public void setProteinAltName(List<String> proteinAltName) {
+        this.proteinAltName = proteinAltName;
+    }
+
+    public List<String> getProteinAltName() {
+        return proteinAltName;
     }
 }

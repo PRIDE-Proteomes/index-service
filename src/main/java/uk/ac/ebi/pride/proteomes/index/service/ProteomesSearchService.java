@@ -16,21 +16,20 @@ import java.util.*;
 
 /**
  * Search service implementation based on the functionality defined in the Solr ProteomesRepository.
- *
+ * <p/>
  * Notes:
- *
+ * <p/>
  * - countByXyz methods are usually based on the corresponding findByXyz method (using the
  * statistics in the returned page) rather than using the Solr count methods. This is done
  * to keep the consistency with the find method in case the find method is customised.
- *
+ * <p/>
  * - findAllByXyz are convenience methods to retrieve all PeptiForms for a given search record
  * without having to deal with paging parameters. This is only available when result sets are
  * expected to be small.
- *
+ * <p/>
  * - most methods querying specific fields will throw an exception if unsupported parameters
  * are provided (like null or empty Strings). Methods querying the general query field will
  * return everything by default.
- *
  *
  * @author florian@ebi.ac.uk
  */
@@ -38,11 +37,10 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class ProteomesSearchService {
 
+    private static final PageRequest CPR = new PageRequest(0, 1); // PageRequest used for counting (page.getTotalElements())
     @Resource
     private ProteomesRepository proteomesRepository;
 
-
-    private static final PageRequest CPR = new PageRequest(0,1); // PageRequest used for counting (page.getTotalElements())
     private static void checkTerm(String term) {
         if (term == null || term.trim().isEmpty()) {
             throw new IllegalArgumentException("A search term is required!");
@@ -56,6 +54,7 @@ public class ProteomesSearchService {
     public Page<SolrPeptiform> findAll(Pageable pageable) {
         return proteomesRepository.findAll(pageable);
     }
+
     public Long countAll() {
         return this.findAll(CPR).getTotalElements();
     }
@@ -63,7 +62,7 @@ public class ProteomesSearchService {
     public Map<Integer, Long> getTaxidFacets() {
         Map<Integer, Long> facetMap = new HashMap<Integer, Long>();
 
-        FacetPage<SolrPeptiform> facetPage = this.proteomesRepository.getTaxidFacets(new PageRequest(0,1));
+        FacetPage<SolrPeptiform> facetPage = this.proteomesRepository.getTaxidFacets(new PageRequest(0, 1));
 
         for (FacetFieldEntry entry : facetPage.getFacetResultPage(SolrPeptiformFields.PEPTIFORM_TAXID)) {
             facetMap.put(Integer.parseInt(entry.getValue()), entry.getValueCount());
@@ -86,6 +85,7 @@ public class ProteomesSearchService {
         checkTerm(sequence);
         return proteomesRepository.findBySequence(sequence, pageable);
     }
+
     public Long countBySequence(String sequence) {
         return this.findBySequence(sequence, CPR).getTotalElements();
     }
@@ -96,6 +96,7 @@ public class ProteomesSearchService {
         }
         return proteomesRepository.findByTaxid(taxid, pageable);
     }
+
     public Long countByTaxid(int taxid) {
         return this.findByTaxid(taxid, CPR).getTotalElements();
     }
@@ -104,26 +105,30 @@ public class ProteomesSearchService {
         checkTerm(species);
         return proteomesRepository.findBySpecies(species, pageable);
     }
+
     public Long countBySpecies(String species) {
         return this.findBySpecies(species, CPR).getTotalElements();
     }
 
-    public Page<SolrPeptiform> findByProtein(String proteinAccession, Pageable pageable) {
+    public Page<SolrPeptiform> findByProteinAccession(String proteinAccession, Pageable pageable) {
         checkTerm(proteinAccession);
-        return proteomesRepository.findByProteins(proteinAccession, pageable);
+        return proteomesRepository.findByProteinAccession(proteinAccession, pageable);
     }
-    public List<SolrPeptiform> findAllByProtein(String proteinAccession) {
+
+    public List<SolrPeptiform> findAllByProteinAccession(String proteinAccession) {
         checkTerm(proteinAccession);
-        return proteomesRepository.findAllByProteins(proteinAccession);
+        return proteomesRepository.findAllByProteinAccession(proteinAccession);
     }
-    public long countByProtein(String proteinAccession) {
-        return this.findByProtein(proteinAccession, CPR).getTotalElements();
+
+    public long countByProteinAccession(String proteinAccession) {
+        return this.findByProteinAccession(proteinAccession, CPR).getTotalElements();
     }
 
     public Page<SolrPeptiform> findByMod(String mod, Pageable pageable) {
         checkTerm(mod);
-        return this.proteomesRepository.findByMods(mod, pageable);
+        return this.proteomesRepository.findByMod(mod, pageable);
     }
+
     public long countByMod(String mod) {
         return this.findByMod(mod, CPR).getTotalElements();
     }
@@ -131,36 +136,29 @@ public class ProteomesSearchService {
     public Page<SolrPeptiform> findByNumProteinsGreaterThan(int num, Pageable page) {
         return this.proteomesRepository.findByNumProteinsGreaterThan(num, page);
     }
+
     public long countByNumProteinsGreaterThan(int num) {
         return this.proteomesRepository.countByNumProteinsGreaterThan(num);
     }
+
     public Page<SolrPeptiform> findByNumProteinsLessThan(int num, Pageable page) {
         return this.proteomesRepository.findByNumProteinsLessThan(num, page);
     }
+
     public long countByNumProteinsLessThan(int num) {
         return this.proteomesRepository.countByNumProteinsLessThan(num);
     }
 
-    public List<SolrPeptiform> findAllByUpGroup(String upGroupId) {
-        checkTerm(upGroupId);
-        return this.proteomesRepository.findAllByUpGroups(upGroupId);
-    }
-    public Page<SolrPeptiform> findByUpGroup(String upGroupId, Pageable pageable) {
-        checkTerm(upGroupId);
-        return this.proteomesRepository.findByUpGroups(upGroupId, pageable);
-    }
-    public long countByUpGroup(String upGroupId) {
-        return this.findByUpGroup(upGroupId, CPR).getTotalElements();
-    }
-
     public List<SolrPeptiform> findAllByGeneGroup(String geneGroupId) {
         checkTerm(geneGroupId);
-        return this.proteomesRepository.findAllByGeneGroups(geneGroupId);
+        return this.proteomesRepository.findAllByGeneGroup(geneGroupId);
     }
+
     public Page<SolrPeptiform> findByGeneGroup(String geneGroupId, Pageable pageable) {
         checkTerm(geneGroupId);
-        return this.proteomesRepository.findByGeneGroups(geneGroupId, pageable);
+        return this.proteomesRepository.findByGeneGroup(geneGroupId, pageable);
     }
+
     public long countByGeneGroup(String geneGroupId) {
         return this.findByGeneGroup(geneGroupId, CPR).getTotalElements();
     }
@@ -177,6 +175,7 @@ public class ProteomesSearchService {
         }
         return proteomesRepository.findByQuery(query, pageable);
     }
+
     public long countByQuery(String query) {
         return this.findByQuery(query, CPR).getTotalElements();
     }
@@ -202,6 +201,7 @@ public class ProteomesSearchService {
         }
         return proteomesRepository.findByQueryNot(query, pageable);
     }
+
     public long countByQueryNot(String query) {
         return this.findByQueryNot(query, CPR).getTotalElements();
     }
@@ -218,6 +218,7 @@ public class ProteomesSearchService {
             return this.proteomesRepository.findByQueryAndFilterTaxid(query, taxIds, pageable);
         }
     }
+
     public long countByQueryAndFilterTaxid(String query, Collection<Integer> taxIds) {
         return this.findByQueryAndFilterTaxid(query, taxIds, CPR).getTotalElements();
     }
@@ -225,20 +226,15 @@ public class ProteomesSearchService {
     public Page<FacetFieldEntry> getProteinCounts(int page, int size, boolean sortByIndex) {
         return this.proteomesRepository.getProteinCounts(page, size, sortByIndex);
     }
+
     public Page<FacetFieldEntry> getProteinCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean sortByIndex) {
         return this.proteomesRepository.getProteinCountsBySpecies(taxids, page, size, sortByIndex);
-    }
-
-    public Page<FacetFieldEntry> getUPGroupCounts(int page, int size, boolean sortByIndex) {
-        return this.proteomesRepository.getUPGroupCounts(page, size, sortByIndex);
-    }
-    public Page<FacetFieldEntry> getUPGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean sortByIndex) {
-        return this.proteomesRepository.getUPGroupCountsBySpecies(taxids, page, size, sortByIndex);
     }
 
     public Page<FacetFieldEntry> getGeneGroupCounts(int page, int size, boolean sortByIndex) {
         return this.proteomesRepository.getGeneGroupCounts(page, size, sortByIndex);
     }
+
     public Page<FacetFieldEntry> getGeneGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean sortByIndex) {
         return this.proteomesRepository.getGeneGroupCountsBySpecies(taxids, page, size, sortByIndex);
     }

@@ -24,6 +24,11 @@ public class TestData {
 
     public static final String PEPTIDE_3_FORM_1_ID = "[ELGAVEK|9606|]";
     public static final String PEPTIDE_3_SEQUENCE = "ELGAVEK";
+
+    public static final String GROUP_DESC_1 = "some description about a group";
+    public static final String GROUP_DESC_2 = "for example keywords like kinase, disease";
+    public static final String GROUP_DESC_3 = "or common names like albumin, p53";
+
     public static final List<String> PEPTIDE_3_PROTEINS;
     static {
         PEPTIDE_3_PROTEINS = new ArrayList<String>(2);
@@ -38,9 +43,15 @@ public class TestData {
         PEPTIDE_3_UP_GROUPS.add("P12346");
         PEPTIDE_3_UP_GROUPS.add("P12347");
     }
-    public static final String GROUP_DESC_1 = "some description about a group";
-    public static final String GROUP_DESC_2 = "for example keywords like kinase, disease";
-    public static final String GROUP_DESC_3 = "or common names like albumin, p53";
+    public static final List<String> PEPTIDE_3_UP_GROUP_DESC;
+    static {
+        PEPTIDE_3_UP_GROUP_DESC = new ArrayList<String>(3);
+        PEPTIDE_3_UP_GROUP_DESC.add(GROUP_DESC_1);
+        PEPTIDE_3_UP_GROUP_DESC.add(GROUP_DESC_2);
+        PEPTIDE_3_UP_GROUP_DESC.add(GROUP_DESC_3);
+
+    }
+
     public static final List<String> PEPTIDE_3_GENE_GROUPS;
     static {
         PEPTIDE_3_GENE_GROUPS = new ArrayList<String>(3);
@@ -48,6 +59,12 @@ public class TestData {
         PEPTIDE_3_GENE_GROUPS.add("GENE2");
     }
 
+    public static final List<String> PEPTIDE_3_GENE_GROUPS_DESC;
+    static {
+        PEPTIDE_3_GENE_GROUPS_DESC = new ArrayList<String>(3);
+        PEPTIDE_3_GENE_GROUPS_DESC.add(GROUP_DESC_1);
+        PEPTIDE_3_GENE_GROUPS_DESC.add(GROUP_DESC_2);
+    }
 
     public static final String PEPTIDE_4_FORM_1_ID = "[EDAANNYAR|9606|]";
     public static final String PEPTIDE_4_FORM_2_ID = "[EDAANNYAR|9606|(1,4)(2,8)(9,15)]";
@@ -104,10 +121,10 @@ public class TestData {
         doc.addField(SolrPeptiformFields.PEPTIFORM_TAXID, taxid);
         doc.addField(SolrPeptiformFields.PEPTIFORM_SPECIES, species);
         if (proteins != null) {
-            doc.addField(SolrPeptiformFields.PROTEINS, proteins);
+            doc.addField(SolrPeptiformFields.PROTEIN_ACCESSION, proteins);
             doc.addField(SolrPeptiformFields.NUM_PROTEINS, proteins.size());
         } else { // default values
-            doc.addField(SolrPeptiformFields.PROTEINS, null);
+            doc.addField(SolrPeptiformFields.PROTEIN_ACCESSION, null);
             doc.addField(SolrPeptiformFields.NUM_PROTEINS, 0);
         }
         return doc;
@@ -120,20 +137,16 @@ public class TestData {
         solrDocuments.add(TestData.createDoc(PEPTIDE_2_FORM_1_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         solrDocuments.add(TestData.createDoc(PEPTIDE_2_FORM_2_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         SolrInputDocument peptide3 = TestData.createDoc(PEPTIDE_3_FORM_1_ID, PEPTIDE_3_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, PEPTIDE_3_PROTEINS);
-        peptide3.addField(SolrPeptiformFields.NUM_UP_GROUPS, PEPTIDE_3_UP_GROUPS.size());
-        peptide3.addField(SolrPeptiformFields.UP_GROUPS, PEPTIDE_3_UP_GROUPS);
         peptide3.addField(SolrPeptiformFields.NUM_GENE_GROUPS, PEPTIDE_3_GENE_GROUPS.size());
-        peptide3.addField(SolrPeptiformFields.GENE_GROUPS, PEPTIDE_3_GENE_GROUPS);
-        peptide3.addField(SolrPeptiformFields.GROUP_DESCS, GROUP_DESC_1 + "\t" + GROUP_DESC_2 + "\t" + GROUP_DESC_3);
+        peptide3.addField(SolrPeptiformFields.GENE_GROUP, PEPTIDE_3_GENE_GROUPS);
+        peptide3.addField(SolrPeptiformFields.GENE_GROUP_DESCRIPTION, GROUP_DESC_1 + "\t" + GROUP_DESC_2 + "\t" + GROUP_DESC_3);
         solrDocuments.add(peptide3);
         solrDocuments.add(TestData.createDoc(PEPTIDE_4_FORM_1_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         SolrInputDocument peptide4_2 = TestData.createDoc(PEPTIDE_4_FORM_2_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null);
-        peptide4_2.addField(SolrPeptiformFields.MODS, PEPTIDE_4_MODS);
+        peptide4_2.addField(SolrPeptiformFields.MOD, PEPTIDE_4_MODS);
         solrDocuments.add(peptide4_2);
         solrDocuments.add(TestData.createDoc(PEPTIDE_4_FORM_3_ID, PEPTIDE_4_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, null));
         SolrInputDocument peptide5 = TestData.createDoc(PEPTIDE_5_FORM_1_ID, PEPTIDE_5_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, PEPTIDE_5_PROTEINS);
-        peptide5.addField(SolrPeptiformFields.NUM_UP_GROUPS, PEPTIDE_5_UP_GROUPS.size());
-        peptide5.addField(SolrPeptiformFields.UP_GROUPS, PEPTIDE_5_UP_GROUPS);
         solrDocuments.add(peptide5);
         solrDocuments.add(TestData.createDoc(PEPTIDE_6_FORM_1_ID, PEPTIDE_6_SEQUENCE, TAXID_HBV,   SPECIES_HBV,   PEPTIDE_6_PROTEINS));
         return solrDocuments;
@@ -146,10 +159,10 @@ public class TestData {
         solrPeptiform.setTaxid(taxid);
         solrPeptiform.setSpecies(species);
         if (proteins != null) {
-            solrPeptiform.setProteins(proteins);
+            solrPeptiform.setProteinAccession(proteins);
             solrPeptiform.setNumProteins(proteins.size());
         } else {
-            solrPeptiform.setProteins(null);
+            solrPeptiform.setProteinAccession(null);
             solrPeptiform.setNumProteins(0);
         }
         return solrPeptiform;
@@ -162,20 +175,16 @@ public class TestData {
         solrPeptiforms.add(TestData.createPeptiForm(PEPTIDE_2_FORM_1_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         solrPeptiforms.add(TestData.createPeptiForm(PEPTIDE_2_FORM_2_ID, PEPTIDE_2_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         SolrPeptiform peptide3 = TestData.createPeptiForm(PEPTIDE_3_FORM_1_ID, PEPTIDE_3_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, PEPTIDE_3_PROTEINS);
-        peptide3.setUpGroups(PEPTIDE_3_UP_GROUPS);
-        peptide3.setNumUpGroups(PEPTIDE_3_UP_GROUPS.size());
-        peptide3.setGeneGroups(PEPTIDE_3_GENE_GROUPS);
+        peptide3.setGeneGroup(PEPTIDE_3_GENE_GROUPS);
         peptide3.setNumGeneGroups(PEPTIDE_3_GENE_GROUPS.size());
-        peptide3.setGroupDescs(GROUP_DESC_1 + "\t" + GROUP_DESC_2 + "\t" + GROUP_DESC_3);
+        peptide3.setGeneGroupDescription(PEPTIDE_3_GENE_GROUPS_DESC);
         solrPeptiforms.add(peptide3);
         solrPeptiforms.add(TestData.createPeptiForm(PEPTIDE_4_FORM_1_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null));
         SolrPeptiform peptide4_2 = TestData.createPeptiForm(PEPTIDE_4_FORM_2_ID, PEPTIDE_4_SEQUENCE, TAXID_HUMAN, SPECIES_HUMAN, null);
-        peptide4_2.setMods(PEPTIDE_4_MODS);
+        peptide4_2.setMod(PEPTIDE_4_MODS);
         solrPeptiforms.add(peptide4_2);
         solrPeptiforms.add(TestData.createPeptiForm(PEPTIDE_4_FORM_3_ID, PEPTIDE_4_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, null));
         SolrPeptiform peptide5 = TestData.createPeptiForm(PEPTIDE_5_FORM_1_ID, PEPTIDE_5_SEQUENCE, TAXID_MOUSE, SPECIES_MOUSE, PEPTIDE_5_PROTEINS);
-        peptide5.setUpGroups(PEPTIDE_5_UP_GROUPS);
-        peptide5.setNumUpGroups(PEPTIDE_5_UP_GROUPS.size());
         solrPeptiforms.add(peptide5);
         solrPeptiforms.add(TestData.createPeptiForm(PEPTIDE_6_FORM_1_ID, PEPTIDE_6_SEQUENCE, TAXID_HBV, SPECIES_HBV,     PEPTIDE_6_PROTEINS));
         return solrPeptiforms;
