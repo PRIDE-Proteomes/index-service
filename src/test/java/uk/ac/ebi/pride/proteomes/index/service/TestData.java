@@ -15,11 +15,11 @@ import java.util.List;
 public class TestData {
 
     public static final String PEPTIDE_1_FORM_1_ID = "[HDCVMPDR|9606|]";
-    public static final String PEPTIDE_1_FORM_2_ID = "[HDCVMPDR|9606|(5,15)]";
+    public static final String PEPTIDE_1_FORM_2_ID = "[HDCVMPDR|9606|(5,MOD:15)]";
     public static final String PEPTIDE_1_SEQUENCE = "HDCVMPDR";
 
     public static final String PEPTIDE_2_FORM_1_ID = "[AAITSYEK|9606|]";
-    public static final String PEPTIDE_2_FORM_2_ID = "[AAITSYEK|9606|(6,4)]";
+    public static final String PEPTIDE_2_FORM_2_ID = "[AAITSYEK|9606|(6,MOD:4)]";
     public static final String PEPTIDE_2_SEQUENCE = "AAITSYEK";
 
     public static final String PEPTIDE_3_FORM_1_ID = "[ELGAVEK|9606|]";
@@ -67,7 +67,7 @@ public class TestData {
     }
 
     public static final String PEPTIDE_4_FORM_1_ID = "[EDAANNYAR|9606|]";
-    public static final String PEPTIDE_4_FORM_2_ID = "[EDAANNYAR|9606|(1,4)(2,8)(9,15)]";
+    public static final String PEPTIDE_4_FORM_2_ID = "[EDAANNYAR|9606|(1,MOD:4)(2,MOD:8)(9,MOD:15)]";
     public static final String PEPTIDE_4_FORM_3_ID = "[EDAANNYAR|10090|]";
     public static final String PEPTIDE_4_SEQUENCE = "EDAANNYAR";
     public static final List<String> PEPTIDE_4_MODS;
@@ -78,7 +78,7 @@ public class TestData {
         PEPTIDE_4_MODS.add("Oxidation");
     }
 
-    public static final String PEPTIDE_5_FORM_1_ID = "[EDSQLASMQHK|10090|(8,15)]";
+    public static final String PEPTIDE_5_FORM_1_ID = "[EDSQLASMQHK|10090|(8,MOD:15)]";
     public static final String PEPTIDE_5_SEQUENCE = "EDSQLASMQHK";
     public static final List<String> PEPTIDE_5_PROTEINS;
     static {
@@ -93,7 +93,7 @@ public class TestData {
         PEPTIDE_5_UP_GROUPS.add("P12344");
     }
 
-    public static final String PEPTIDE_6_FORM_1_ID = "[TESTTEST|121225|(8,15)]";
+    public static final String PEPTIDE_6_FORM_1_ID = "[TESTTEST|121225|(8,MOD:15)]";
     public static final String PEPTIDE_6_SEQUENCE = "TESTTEST";
     public static final List<String> PEPTIDE_6_PROTEINS;
     static {
