@@ -10,9 +10,9 @@ import java.util.Collection;
  */
 public interface ProteomesRepositoryCustom {
 
-    public Page<FacetFieldEntry> getProteinCounts(int page, int size, boolean soryByIndex);
-    public Page<FacetFieldEntry> getProteinCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex);
+    Page<FacetFieldEntry> getProteinCounts(int page, int size, boolean soryByIndex);
+    Page<FacetFieldEntry> getProteinCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex);
 
-    public Page<FacetFieldEntry> getGeneGroupCounts(int page, int size, boolean soryByIndex);
-    public Page<FacetFieldEntry> getGeneGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex);
+    Page<FacetFieldEntry> getGeneGroupCounts(int page, int size, boolean soryByIndex);
+    Page<FacetFieldEntry> getGeneGroupCountsBySpecies(Collection<Integer> taxids, int page, int size, boolean soryByIndex);
 }
