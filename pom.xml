@@ -3,30 +3,22 @@
 
     <parent> <!-- parent POM -->
         <groupId>uk.ac.ebi.pride.proteomes.maven</groupId>
-        <artifactId>parent</artifactId>
-        <version>1.0.1</version>
+        <artifactId>proteomes-maven-parent</artifactId>
+        <version>1.0.0</version>
     </parent>
 
-    <groupId>uk.ac.ebi.pride.proteomes</groupId>
-    <artifactId>index-service</artifactId>
+    <groupId>uk.ac.ebi.pride.proteomes.index</groupId>
+    <artifactId>proteomes-index-service</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
 
     <name>PRIDE Proteomes Index Service</name>
     <description>This package contains the service library for the PRIDE Proteomes index.</description>
-    <url>http://www.ebi.ac.uk/pride/proteomes</url>
 
     <!--
-            To build the project use:
-                mvn clean package
-        -->
-    <licenses>
-        <license>
-            <name>The Apache Software License 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+        To build and run the project maven profiles are needed:
+            pride-proteomes
+    -->
 
     <developers>
         <developer>
@@ -36,6 +28,14 @@
             <organization>Proteomics Services Team, EMBL - European Bioinformatics Institute</organization>
         </developer>
     </developers>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <organization>
         <name>EMBL - European Bioinformatics Institute</name>
