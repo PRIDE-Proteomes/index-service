@@ -1,6 +1,6 @@
 .idea/
 *.iml
-src/main/resources/solr/collection1/data/
+src/main/resources/solr/proteomes/data/
 target/
 
 ### Java template

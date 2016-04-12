@@ -1,7 +1,7 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -17,6 +17,7 @@ import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiform;
 import uk.ac.ebi.pride.proteomes.index.model.SolrPeptiformFields;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
@@ -61,9 +62,9 @@ public class ProteomesIndexServiceTest {
      * @throws SolrServerException
      */
     @Test
-    public void testSaveAndDelete() throws SolrServerException {
+    public void testSaveAndDelete() throws SolrServerException, IOException {
 
-        SolrServer server = solrOperations.getSolrServer();
+        SolrClient server = solrOperations.getSolrClient();
 
         // first insert the test data
         proteomesIndexService.save(createTestPeptiForms());

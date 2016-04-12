@@ -1,8 +1,8 @@
 package uk.ac.ebi.pride.proteomes.index.service;
 
 
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.util.ClientUtils;
@@ -49,12 +49,12 @@ public class ProteomesSearchServiceTest {
 
     private static final List<SolrInputDocument> docs = createTestDocs();
 
-    private SolrServer server;
+    private SolrClient solrClient;
 
     @Before
     public void setUp() throws Exception {
 
-        server = solrOperations.getSolrServer();
+        solrClient = solrOperations.getSolrClient();
 
         // insert test data
         solrOperations.saveBeans(docs);
@@ -73,27 +73,27 @@ public class ProteomesSearchServiceTest {
     @Test
     public void testEmptyIndex() throws SolrServerException, IOException {
 
-        server.deleteByQuery("*:*");
+        solrClient.deleteByQuery("*:*");
         //make sure the changes are committed
-        server.commit();
+        solrClient.commit();
 
         // query for everything (e.g. *)
-        QueryResponse response = server.query(new SolrQuery("*"));
+        QueryResponse response = solrClient.query(new SolrQuery("*"));
 
         assertEquals(0, response.getResults().size());
     }
 
     @Test
-    public void testThatAllResultsAreReturned() throws SolrServerException {
+    public void testThatAllResultsAreReturned() throws SolrServerException, IOException {
         SolrParams params = new SolrQuery("*");
-        QueryResponse response = server.query(params);
+        QueryResponse response = solrClient.query(params);
         assertEquals(COUNT_TOTAL_DOCS, response.getResults().getNumFound());
     }
 
     @Test
-    public void testThatNoResultsAreReturned() throws SolrServerException {
+    public void testThatNoResultsAreReturned() throws SolrServerException, IOException {
         SolrParams params = new SolrQuery("text that is not found");
-        QueryResponse response = server.query(params);
+        QueryResponse response = solrClient.query(params);
         assertEquals(0, response.getResults().getNumFound());
     }
 
@@ -102,16 +102,16 @@ public class ProteomesSearchServiceTest {
     public void testQueryByAccession() throws Exception {
         // we need to escape the peptiform IDs as they contain reserved special characters
         SolrParams params = new SolrQuery(SolrPeptiformFields.ID + ":" + ClientUtils.escapeQueryChars(PEPTIDE_1_FORM_1_ID));
-        QueryResponse response = server.query(params);
+        QueryResponse response = solrClient.query(params);
         // we expect exactly one result for a query by ID
         assertEquals(1, response.getResults().getNumFound());
         assertEquals(PEPTIDE_1_FORM_1_ID, response.getResults().get(0).get(SolrPeptiformFields.ID));
     }
 
     @Test
-    public void testQueryBySequence() throws SolrServerException {
+    public void testQueryBySequence() throws SolrServerException, IOException {
         SolrParams params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SEQUENCE + ":" + PEPTIDE_1_SEQUENCE);
-        QueryResponse response = server.query(params);
+        QueryResponse response = solrClient.query(params);
         // we expect two documents, since we have two PeptiForms with that sequence
         assertEquals(2, response.getResults().getNumFound());
         SolrDocument one = response.getResults().get(0);
@@ -125,45 +125,45 @@ public class ProteomesSearchServiceTest {
     }
 
     @Test
-    public void testQueryByTaxid() throws SolrServerException {
+    public void testQueryByTaxid() throws SolrServerException, IOException {
         SolrParams params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_TAXID + ":" + TAXID_HUMAN);
-        QueryResponse response = server.query(params);
+        QueryResponse response = solrClient.query(params);
         // we expect 7 documents, since we have 7 PeptiForms with that taxid
         assertEquals(HUMAN_RECORDS, response.getResults().getNumFound());
         params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_TAXID + ":" + TAXID_MOUSE);
-        response = server.query(params);
+        response = solrClient.query(params);
         // we expect two documents, since we have two PeptiForms with that taxid
         assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
     }
 
     @Test
-    public void testQueryBySpeciesName() throws SolrServerException {
+    public void testQueryBySpeciesName() throws SolrServerException, IOException {
         SolrParams params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SPECIES + ":" + SPECIES_HUMAN);
-        QueryResponse response = server.query(params);
+        QueryResponse response = solrClient.query(params);
         // service terms are tokenized, so we expect 8 documents,
         // we have 7 (human) and 1 (human louse) PeptiForms that match the service terms
         assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
         // same results if we only use (the matching) service token
         params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SPECIES + ":human");
-        response = server.query(params);
+        response = solrClient.query(params);
         assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
 
         params = new SolrQuery(SolrPeptiformFields.PEPTIFORM_SPECIES + ":" + SPECIES_MOUSE);
-        response = server.query(params);
+        response = solrClient.query(params);
         // we expect two documents, since we have two PeptiForms with that species name
         assertEquals(MOUSE_RECORDS, response.getResults().getNumFound());
     }
 
     @Test
-    public void testQueryByText() throws SolrServerException {
+    public void testQueryByText() throws SolrServerException, IOException {
         SolrParams params = new SolrQuery("text:*human*");
-        QueryResponse response = server.query(params);
+        QueryResponse response = solrClient.query(params);
         // we expect 8 documents, since we have 7 human and 1 human louse PeptiForms
         assertEquals(HUMAN_RECORDS + HBV_RECORDS, response.getResults().getNumFound());
 
 
         params = new SolrQuery("text:P12345");
-        response = server.query(params);
+        response = solrClient.query(params);
         // we expect 2 documents, since we have 2 peptiforms linked to this protein
         assertEquals(2, response.getResults().getNumFound());
     }
